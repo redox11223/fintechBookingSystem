@@ -34,7 +34,8 @@ CREATE TABLE advisors (
                           id UUID PRIMARY KEY,
                           user_id UUID NOT NULL UNIQUE,
                           full_name VARCHAR(100) NOT NULL,
-                          internal_code VARCHAR(20) UNIQUE,
+                          internal_code VARCHAR(20) NOT NULL UNIQUE,
+                          specialization VARCHAR(100) NOT NULL DEFAULT 'General',
                           created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
                           updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
 

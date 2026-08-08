@@ -23,5 +23,5 @@ public class TimeOff extends BaseEntity {
   @Column(name = "off_date",nullable = false)
   private LocalDate offDate;
 
-  private String description;
+  private String reason;
 }

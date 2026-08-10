@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class ServiceCategoryImpl implements ServiceCategoryService{
+public class ServiceCategoryServiceImpl implements ServiceCategoryService{
 
   private final ServiceCategoryRepo categoryRepo;
   private final ServiceCategoryMapper categoryMapper;
@@ -25,25 +25,27 @@ public class ServiceCategoryImpl implements ServiceCategoryService{
       throw new DuplicateResourceException("Category already exists");
     }
     ServiceCategory serviceCategory=new ServiceCategory(request.name(), request.description());
-    categoryRepo.save(serviceCategory);
-    return categoryMapper.serviceCategoryToDto(serviceCategory);
+    return categoryMapper.serviceCategoryToDto(categoryRepo.save(serviceCategory));
   }
 
   @Transactional
   @Override
   public ServiceCategoryResponse updateCategory(UUID id, ServiceCategoryRequest request) {
-    if(categoryRepo.existsByNameIgnoreCaseAndIdNot(request.name(),id)){
+    ServiceCategory serviceCategory=categoryRepo.findById(id)
+            .orElseThrow(()-> new ResourceNotFoundException("Category not found"));
+    boolean nameChanged=!serviceCategory.getName().equalsIgnoreCase(request.name());
+    if(nameChanged && categoryRepo.existsByNameIgnoreCaseAndIdNot(request.name(),id)){
       throw new DuplicateResourceException("Category already exists");
     }
-    ServiceCategory serviceCategory=categoryRepo.findById(id).orElseThrow(()-> new ResourceNotFoundException("Category not found"));
     serviceCategory.setName(request.name());
     serviceCategory.setDescription(request.description());
-    return categoryMapper.serviceCategoryToDto(serviceCategory);
+    return categoryMapper.serviceCategoryToDto(categoryRepo.save(serviceCategory));
   }
 
   @Override
   public ServiceCategoryResponse getCategory(UUID id) {
-    ServiceCategory serviceCategory=categoryRepo.findById(id).orElseThrow(()-> new ResourceNotFoundException("Category not found"));
+    ServiceCategory serviceCategory=categoryRepo.findById(id)
+            .orElseThrow(()-> new ResourceNotFoundException("Category not found"));
     return categoryMapper.serviceCategoryToDto(serviceCategory);
   }
 }

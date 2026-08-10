@@ -25,5 +25,5 @@ public class FinancialService extends BaseEntity {
   private int durationMinutes;
 
   @Column(name = "is_active")
-  private boolean isActive;
+  private boolean isActive=true;
 }

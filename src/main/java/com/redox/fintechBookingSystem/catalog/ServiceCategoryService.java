@@ -9,4 +9,5 @@ public interface ServiceCategoryService {
   ServiceCategoryResponse registerCategory(ServiceCategoryRequest request);
   ServiceCategoryResponse updateCategory(UUID id,ServiceCategoryRequest request);
   ServiceCategoryResponse getCategory(UUID id);
+  ServiceCategory getCategoryEntity(UUID id);
 }

@@ -2,6 +2,7 @@ package com.redox.fintechBookingSystem.catalog;
 
 import com.redox.fintechBookingSystem.catalog.dto.ServiceCategoryRequest;
 import com.redox.fintechBookingSystem.catalog.dto.ServiceCategoryResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class ServiceCategoryController {
   }
 
   @PostMapping
-  public ResponseEntity<ServiceCategoryResponse> createCategory(@RequestBody ServiceCategoryRequest categoryRequest){
+  public ResponseEntity<ServiceCategoryResponse> createCategory(@Valid @RequestBody ServiceCategoryRequest categoryRequest){
     var category=categoryService.registerCategory(categoryRequest);
     URI location=ServletUriComponentsBuilder
             .fromCurrentRequest()
@@ -35,7 +36,7 @@ public class ServiceCategoryController {
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<ServiceCategoryResponse> updateCategory(@PathVariable UUID id,@RequestBody ServiceCategoryRequest categoryRequest){
+  public ResponseEntity<ServiceCategoryResponse> updateCategory(@PathVariable UUID id,@Valid @RequestBody ServiceCategoryRequest categoryRequest){
     var category=categoryService.updateCategory(id,categoryRequest);
     return ResponseEntity.ok(category);
   }

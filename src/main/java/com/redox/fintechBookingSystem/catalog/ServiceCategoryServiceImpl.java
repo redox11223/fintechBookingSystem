@@ -42,10 +42,16 @@ public class ServiceCategoryServiceImpl implements ServiceCategoryService{
     return categoryMapper.serviceCategoryToDto(categoryRepo.save(serviceCategory));
   }
 
+  @Transactional(readOnly = true)
   @Override
   public ServiceCategoryResponse getCategory(UUID id) {
-    ServiceCategory serviceCategory=categoryRepo.findById(id)
-            .orElseThrow(()-> new ResourceNotFoundException("Category not found"));
+    ServiceCategory serviceCategory=getCategoryEntity(id);
     return categoryMapper.serviceCategoryToDto(serviceCategory);
+  }
+
+  @Override
+  public ServiceCategory getCategoryEntity(UUID id){
+    return categoryRepo.findById(id)
+            .orElseThrow(()-> new ResourceNotFoundException("Category not found"));
   }
 }

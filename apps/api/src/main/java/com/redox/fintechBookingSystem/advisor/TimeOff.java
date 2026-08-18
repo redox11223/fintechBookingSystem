@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.OffsetDateTime;
 
 @Entity
 @Getter @Setter
@@ -20,8 +20,12 @@ public class TimeOff extends BaseEntity {
   @JoinColumn(name = "advisor_id")
   private Advisor advisor;
 
-  @Column(name = "off_date",nullable = false)
-  private LocalDate offDate;
+  @Column(name = "starts_at",nullable = false)
+  private OffsetDateTime startsAt;
 
+  @Column(name = "ends_at",nullable = false)
+  private OffsetDateTime endsAt;
+
+  @Column(nullable = false, length = 500)
   private String reason;
 }

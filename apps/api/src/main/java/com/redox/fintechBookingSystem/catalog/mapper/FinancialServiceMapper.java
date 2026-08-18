@@ -8,5 +8,6 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface FinancialServiceMapper {
   @Mapping(source = "category.name",target = "categoryName")
+  @Mapping(source = "active",target = "isActive")
   FinancialServiceResponse financialServiceToDto(FinancialService financialService);
 }

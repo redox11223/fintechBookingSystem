@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -41,7 +40,4 @@ public class FinancialServiceController {
     var service= financialService.getFinancialService(id);
     return ResponseEntity.ok(service);
   }
-
-  @GetMapping
-  public ResponseEntity<List<FinancialServiceResponse>> get
 }

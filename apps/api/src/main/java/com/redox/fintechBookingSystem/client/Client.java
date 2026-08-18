@@ -12,9 +12,7 @@ import lombok.Setter;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "clients",uniqueConstraints = {
-        @UniqueConstraint(name = "uq_client_document",columnNames = {"document_type","document_number"})
-})
+@Table(name = "clients")
 public class Client extends BaseEntity {
   //in oneToOne and ManyToOne relationships the default is eager change it to lazy,joinColumn should
   //be in the entity that has the foreign key
@@ -22,15 +20,9 @@ public class Client extends BaseEntity {
   @JoinColumn(name = "user_id",nullable = false,unique = true)
   private User user;
 
-  @Column(name = "full_name",nullable = false,length = 100)
+  @Column(name = "full_name",nullable = false,length = 120)
   private String fullName;
 
-  @Column(name = "document_type",nullable = false,length = 20)
-  private String documentType;
-
-  @Column(name = "document_number",nullable = false,length = 20)
-  private String documentNumber;
-
-  @Column(name = "phone_number",nullable = false,length = 20)
+  @Column(name = "phone_number",nullable = false,length = 16)
   private String phoneNumber;
 }

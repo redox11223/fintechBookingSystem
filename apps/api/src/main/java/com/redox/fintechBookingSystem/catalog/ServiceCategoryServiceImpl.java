@@ -6,6 +6,8 @@ import com.redox.fintechBookingSystem.catalog.mapper.ServiceCategoryMapper;
 import com.redox.fintechBookingSystem.shared.exception.DuplicateResourceException;
 import com.redox.fintechBookingSystem.shared.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +26,7 @@ public class ServiceCategoryServiceImpl implements ServiceCategoryService{
     if (categoryRepo.existsByNameIgnoreCase(request.name())){
       throw new DuplicateResourceException("Category already exists");
     }
-    ServiceCategory serviceCategory=new ServiceCategory(request.name(), request.description());
+    ServiceCategory serviceCategory=new ServiceCategory(request.name(), request.description(), true);
     return categoryMapper.serviceCategoryToDto(categoryRepo.save(serviceCategory));
   }
 
@@ -53,5 +55,12 @@ public class ServiceCategoryServiceImpl implements ServiceCategoryService{
   public ServiceCategory getCategoryEntity(UUID id){
     return categoryRepo.findById(id)
             .orElseThrow(()-> new ResourceNotFoundException("Category not found"));
+  }
+
+  @Transactional(readOnly = true)
+  @Override
+  public Page<ServiceCategoryResponse> getCategories(Pageable pageable) {
+    return categoryRepo.findAll(pageable)
+            .map(categoryMapper::serviceCategoryToDto);
   }
 }

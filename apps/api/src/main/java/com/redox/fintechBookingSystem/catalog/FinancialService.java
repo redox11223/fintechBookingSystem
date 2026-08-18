@@ -17,11 +17,16 @@ public class FinancialService extends BaseEntity {
   @JoinColumn(name = "category_id",nullable = false)
   private ServiceCategory category;
 
-  @Column(nullable = false,length = 100)
+  @Column(nullable = false,length = 120)
   private String name;
 
+  @Column(length = 1000)
+  private String description;
+
+  @Column(name = "duration_minutes", nullable = false)
   private int durationMinutes;
 
-  @Column(name = "is_active")
+  @Column(name = "is_active", nullable = false)
+  @Builder.Default
   private boolean isActive=true;
 }

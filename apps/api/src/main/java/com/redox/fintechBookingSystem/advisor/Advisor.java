@@ -18,12 +18,15 @@ public class Advisor extends BaseEntity {
   @JoinColumn(name = "user_id",unique = true,nullable = false)
   private User user;
 
-  @Column(name = "full_name",nullable = false,length = 100)
+  @Column(name = "full_name",nullable = false,length = 120)
   private String fullName;
 
-  @Column(name = "internal_code",nullable = false,unique = true, length = 20)
+  @Column(name = "internal_code",nullable = false, length = 30)
   private String internalCode;
 
-  @Column(nullable = false, length = 100)
+  @Column(nullable = false, length = 120)
   private String specialization;
+
+  @Column(name = "is_active", nullable = false)
+  private boolean isActive = true;
 }

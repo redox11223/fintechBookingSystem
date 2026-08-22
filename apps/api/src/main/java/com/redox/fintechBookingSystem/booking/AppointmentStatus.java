@@ -1,4 +1,4 @@
-package com.redox.fintechBookingSystem.appointment;
+package com.redox.fintechBookingSystem.booking;
 
 public enum AppointmentStatus {
   CONFIRMED,

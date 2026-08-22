@@ -1,4 +1,4 @@
-package com.redox.fintechBookingSystem.client;
+package com.redox.fintechBookingSystem.customer;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

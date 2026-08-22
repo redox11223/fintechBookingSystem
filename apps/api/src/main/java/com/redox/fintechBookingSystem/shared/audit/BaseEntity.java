@@ -2,19 +2,19 @@ package com.redox.fintechBookingSystem.shared.audit;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
 @MappedSuperclass
-@EntityListeners(AuditingEntityListener.class) //check jpa entity listeners and callbacks
-@Getter @Setter
+//check jpa entity listeners and callbacks for more info on how this works
+@EntityListeners(AuditingEntityListener.class)
+@Getter
 public abstract class BaseEntity {
 
   @Id
@@ -23,11 +23,11 @@ public abstract class BaseEntity {
 
   @CreatedDate
   @Column(name = "created_at",nullable = false,updatable = false)
-  private OffsetDateTime createdAt;
+  private Instant createdAt;
 
   @LastModifiedDate
-  @Column(name = "updated_at")
-  private OffsetDateTime updatedAt;
+  @Column(name = "updated_at",nullable = false)
+  private Instant updatedAt;
   @Override
   public final boolean equals(Object o) {
     if (this == o) return true;

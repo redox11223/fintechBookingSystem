@@ -10,9 +10,9 @@ profesional de extremo a extremo y, al mismo tiempo, servir como espacio de apre
 
 ## Estado
 
-El proyecto se encuentra en la **Entrega 0: baseline y documentación**. El código existente
-del catálogo es un punto de partida y todavía no representa una API estable ni lista para
-producción.
+La **Entrega 0: baseline y documentación** está terminada. El repositorio cuenta con una base
+reproducible y verificada; los casos de uso del negocio se incorporarán progresivamente desde
+la Entrega 1 y la API todavía no se considera lista para producción.
 
 ## Estructura
 
@@ -53,6 +53,11 @@ cd apps/api
 ./mvnw test
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=local
 ```
+
+Con la API iniciada localmente, Swagger UI está disponible en
+[http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) y el contrato JSON
+en [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs). Estas rutas están
+deshabilitadas con el perfil `prod`.
 
 Spring Boot detecta el Compose ubicado en la raíz. Si `5432` ya está ocupado, cambia `DB_PORT`
 en `.env` antes de iniciar la infraestructura.

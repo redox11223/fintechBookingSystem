@@ -1,4 +1,4 @@
-package com.redox.fintechBookingSystem.user;
+package com.redox.fintechBookingSystem.identity;
 
 public enum Roles {
   CLIENT,

@@ -1,7 +1,5 @@
-package com.redox.fintechBookingSystem.user;
+package com.redox.fintechBookingSystem.identity;
 
-import com.redox.fintechBookingSystem.advisor.Advisor;
-import com.redox.fintechBookingSystem.client.Client;
 import com.redox.fintechBookingSystem.shared.audit.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -19,12 +17,6 @@ import java.util.Set;
 @AllArgsConstructor
 @Table(name = "users")
 public class User extends BaseEntity {
-  @OneToOne(mappedBy = "user")
-  private Client client;
-
-  @OneToOne(mappedBy = "user")
-  private Advisor advisor;
-
   @Column(nullable = false,length = 254)
   private String email;
 

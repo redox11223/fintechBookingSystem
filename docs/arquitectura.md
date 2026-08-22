@@ -41,6 +41,22 @@ Los módulos se comunican mediante API pública explícita y eventos internos cu
 necesidad real de desacoplamiento. No se añadirá infraestructura de eventos persistentes antes
 de implementar el primer caso de uso que la requiera.
 
+### Límites actuales verificados
+
+```text
+identity ───────────────────────────────→ shared
+customer ───────────────→ identity ────→ shared
+advisor  ───────────────→ identity ────→ shared
+catalog  ───────────────────────────────→ shared
+booking  ─→ customer, advisor, catalog ─→ shared
+```
+
+Spring Modulith verifica estas dependencias durante las pruebas. `shared` es temporalmente un
+módulo abierto porque sus paquetes técnicos (`audit`, `config`, `exception` y `json`) son usados
+por los módulos de negocio. Cuando sus contratos se estabilicen se expondrán interfaces nombradas
+para cerrarlo. Las relaciones JPA también respetan la dirección del grafo: `Client` y `Advisor`
+referencian a `User`, pero `User` no mantiene referencias inversas.
+
 ## Persistencia e integridad
 
 - Flyway es la fuente de verdad y Hibernate usa `ddl-auto: validate`.
@@ -54,6 +70,8 @@ de implementar el primer caso de uso que la requiera.
 ## API
 
 - REST JSON, documentada code-first con OpenAPI.
+- En desarrollo, el documento está en `/v3/api-docs` y Swagger UI en `/swagger-ui.html`; ambos se
+  deshabilitan mediante el perfil `prod`.
 - Problem Details (RFC 9457) para errores uniformes.
 - `Idempotency-Key` en creación de citas y `ETag`/`If-Match` en sus mutaciones.
 - Paginación por página para conjuntos administrativos y keyset para historiales extensos.

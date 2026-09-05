@@ -22,9 +22,55 @@ spring:
     baseline-on-migrate: false
     locations: classpath:db/migration
     validate-migration-naming: true
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1025}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      "[mail.smtp.auth]": ${MAIL_SMTP_AUTH:false}
+      "[mail.smtp.starttls.enable]": ${MAIL_SMTP_STARTTLS:false}
+      "[mail.smtp.connectiontimeout]": ${MAIL_CONNECTION_TIMEOUT_MS:5000}
+      "[mail.smtp.timeout]": ${MAIL_READ_TIMEOUT_MS:3000}
+      "[mail.smtp.writetimeout]": ${MAIL_WRITE_TIMEOUT_MS:5000}
 
 server:
   port: ${SERVER_PORT:8080}
+
+citafin:
+  identity:
+    password:
+      min-characters: 15
+      max-characters: 64
+      max-utf8-bytes: 72
+      bcrypt-strength: ${BCRYPT_STRENGTH:12}
+    tokens:
+      email-verification-ttl: PT24H
+      password-reset-ttl: PT30M
+      staff-invitation-ttl: PT72H
+      mfa-challenge-ttl: PT5M
+      resend-cooldown: PT1M
+    login:
+      max-failures: 5
+      failure-window: PT15M
+      lock-duration: PT15M
+    session:
+      access-token-ttl: PT10M
+      refresh-token-ttl: P30D
+      refresh-cookie-name: citafin_refresh
+      secure-cookie: ${SECURE_COOKIES:false}
+    mfa:
+      code-length: 6
+      time-step-seconds: 30
+      allowed-time-step-drift: 1
+      recovery-code-count: 10
+    mail:
+      from: ${MAIL_FROM:no-reply@citafin.local}
+      frontend-base-url: ${FRONTEND_BASE_URL:http://localhost:5173}
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+    secrets:
+      jwt-hmac-key: ${JWT_HMAC_SECRET:}
+      mfa-encryption-key: ${MFA_ENCRYPTION_KEY:}
 
 management:
   endpoints:

@@ -20,10 +20,11 @@ Estados: `PENDIENTE`, `EN CURSO`, `TERMINADO`. Responsables: `TÚ`, `YO`, `JUNTO
 **Salida:** repositorio reproducible, documentación base, migración validada en PostgreSQL y
 build verde. No incluye completar casos de uso del negocio.
 
-## Entrega 1 — Identidad y seguridad (`PENDIENTE`)
+## Entrega 1 — Identidad y seguridad (`EN CURSO`)
 
 Registro/verificación de clientes, login, refresh rotativo, logout, recuperación, roles,
-invitación de personal, MFA TOTP y eventos de seguridad. La división se acordará antes de iniciar.
+invitación de personal, MFA TOTP y eventos de seguridad. División y seguimiento detallados en
+[`docs/entregas/entrega-1-identidad.md`](entregas/entrega-1-identidad.md).
 
 ## Entrega 2 — Organización, catálogo y asesores (`PENDIENTE`)
 
@@ -56,6 +57,5 @@ Pruebas E2E y de carga, accesibilidad, seguridad, contenedores, despliegue y run
 
 ## Próximo punto de control
 
-Definir la división `TÚ`, `YO` y `JUNTOS` de la Entrega 1 antes de implementar identidad y
-seguridad. Acordar primero los casos de uso, contratos y criterios de aceptación del registro y
-la autenticación, sin ampliar los límites de la versión 1.
+Diseñar juntos las tablas, relaciones, constraints e índices mínimos del registro y la
+verificación. Después, el desarrollador escribirá la migración y el agente la revisará y probará.

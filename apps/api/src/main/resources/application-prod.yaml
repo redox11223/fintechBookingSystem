@@ -3,3 +3,8 @@ springdoc:
     enabled: false
   swagger-ui:
     enabled: false
+
+citafin:
+  identity:
+    session:
+      secure-cookie: true

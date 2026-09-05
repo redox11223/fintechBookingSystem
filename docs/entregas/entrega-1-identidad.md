@@ -25,8 +25,8 @@ explícita para la tarea concreta.
 | 1 | Revisar modelo de amenazas y fijar contratos del primer flujo | JUNTOS | TERMINADO |
 | 1 | Incorporar dependencias de JWT, SMTP y TOTP | YO | TERMINADO |
 | 1 | Preparar configuración externalizada y sus pruebas | YO | TERMINADO |
-| 1 | Diseñar tablas, constraints e índices de identidad | JUNTOS | PENDIENTE |
-| 1 | Escribir la migración Flyway a partir del diseño acordado | TÚ, con guía y revisión | PENDIENTE |
+| 1 | Diseñar tablas, constraints e índices de identidad | JUNTOS | TERMINADO |
+| 1 | Escribir la migración Flyway a partir del diseño acordado | TÚ, con guía y revisión | TERMINADO |
 | 2 | Diseñar requests, respuestas y errores de registro/verificación | JUNTOS | PENDIENTE |
 | 2 | Implementar registro, normalización y ciclo del token de verificación | TÚ, con guía y revisión | PENDIENTE |
 | 2 | Preparar adaptador SMTP, pruebas y documentación OpenAPI | YO | PENDIENTE |

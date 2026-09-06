@@ -9,10 +9,12 @@ contraseña, invitación de personal, MFA TOTP y eventos de seguridad, conforme 
 
 ## Responsabilidades
 
-- **TÚ:** diseñar e implementar la lógica de registro, tokens, rotación, bloqueo, invitaciones y MFA.
-- **YO:** preparar conceptos y criterios, estructura, configuración, adaptadores mecánicos, pruebas,
-  documentación y revisión concreta del código que propongas.
-- **JUNTOS:** contratos, modelo de amenazas y decisiones duraderas.
+- **TÚ:** implementar todo el código de producción de identidad, incluidos controladores,
+  persistencia, lógica, seguridad y adaptadores.
+- **YO:** preparar conceptos y criterios, implementar pruebas de contrato e infraestructura,
+  mantener la documentación y revisar concretamente el código que propongas.
+- **JUNTOS:** contratos, modelo de amenazas, decisiones duraderas y diseño de las pruebas de lógica
+  de negocio; después de acordarlas, YO las implemento.
 
 Trabajaremos una tarea a la vez. La petición de ejecutar una entrega no autoriza al agente a
 implementar las tareas marcadas como **TÚ**; una implementación completa requerirá autorización
@@ -27,9 +29,9 @@ explícita para la tarea concreta.
 | 1 | Preparar configuración externalizada y sus pruebas | YO | TERMINADO |
 | 1 | Diseñar tablas, constraints e índices de identidad | JUNTOS | TERMINADO |
 | 1 | Escribir la migración Flyway a partir del diseño acordado | TÚ, con guía y revisión | TERMINADO |
-| 2 | Diseñar requests, respuestas y errores de registro/verificación | JUNTOS | PENDIENTE |
-| 2 | Implementar registro, normalización y ciclo del token de verificación | TÚ, con guía y revisión | PENDIENTE |
-| 2 | Preparar adaptador SMTP, pruebas y documentación OpenAPI | YO | PENDIENTE |
+| 2 | Diseñar requests, respuestas y errores de registro/verificación | JUNTOS | TERMINADO |
+| 2 | Implementar registro, normalización y ciclo del token de verificación | TÚ, con guía y revisión | EN CURSO |
+| 2 | Preparar adaptador SMTP, pruebas y documentación OpenAPI | TÚ código; YO pruebas y documentación | PENDIENTE |
 | 3 | Implementar login, bloqueo y emisión del access token | TÚ, con guía y revisión | PENDIENTE |
 | 3 | Implementar rotación, detección de reutilización y logout | TÚ, con guía y revisión | PENDIENTE |
 | 3 | Preparar cookies, CSRF, CORS y pruebas concurrentes | YO | PENDIENTE |
@@ -48,7 +50,8 @@ explícita para la tarea concreta.
 - Access JWT HS256 de 10 minutos y sesión refresh con máximo absoluto de 30 días.
 - Verificación 24 horas, recuperación 30 minutos, invitación 72 horas y desafío MFA 5 minutos.
 - Bloqueo de 15 minutos después de 5 fallos dentro de una ventana de 15 minutos.
-- Refresh en cookie HttpOnly/SameSite Strict; protección CSRF para operaciones con cookie.
+- Refresh en cookie HttpOnly/SameSite Strict; protección CSRF para operaciones con cookie. La
+  relación de dominios entre web y API se fijará antes de implementar cookies, CORS y CSRF.
 - El bootstrap crea una invitación, nunca una contraseña ni un secreto versionado.
 - La entrega 1 usa SMTP directo. Outbox, reintentos y operación robusta pertenecen a la Entrega 5.
 
@@ -146,4 +149,6 @@ las pruebas aisladas de propiedades, modularidad y Problem Details pasan.
 ## Continuidad
 
 Al retomar: leer `AGENTS.md`, `docs/roadmap.md`, este archivo y ADR-002; revisar `git status` y
-continuar desde el primer bloque sin marcar. No es necesario releer todos los documentos.
+continuar en el bloque 2. Los DTO HTTP y el mapeo JPA de `email_verification_tokens` están
+preparados; el siguiente ejercicio es implementar por separado la normalización y la política de
+contraseñas antes de orquestar el registro. No es necesario releer todos los documentos.

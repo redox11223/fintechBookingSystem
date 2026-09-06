@@ -57,5 +57,6 @@ Pruebas E2E y de carga, accesibilidad, seguridad, contenedores, despliegue y run
 
 ## Próximo punto de control
 
-Diseñar juntos las tablas, relaciones, constraints e índices mínimos del registro y la
-verificación. Después, el desarrollador escribirá la migración y el agente la revisará y probará.
+Implementar y revisar la normalización de entradas y la política configurable de contraseñas del
+registro. Después se incorporarán la generación y el hash del token, todavía sin orquestar el caso
+de uso completo.

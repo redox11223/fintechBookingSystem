@@ -18,7 +18,11 @@ de negocio y exponen únicamente una API explícita.
 
 ## Consecuencias
 
-- Un solo despliegue y una transacción local simplifican desarrollo y operación.
+- La API constituye una sola unidad desplegable y conserva transacciones locales; la aplicación
+  web puede desplegarse de forma independiente desde el mismo repositorio.
 - El monorepo permite cambios atómicos de contrato entre API y web.
 - Los límites requieren disciplina y pruebas; no ofrecen aislamiento de procesos.
 - Separar un módulo en el futuro será posible, pero no es una meta de V1.
+- El proveedor y la topología de producción se decidirán en un ADR posterior. Antes de implementar
+  refresh cookies se fijará si web y API compartirán sitio o usarán un proxy, porque esa elección
+  afecta SameSite, CORS y CSRF.

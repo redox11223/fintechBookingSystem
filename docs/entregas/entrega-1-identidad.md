@@ -146,9 +146,25 @@ JWT, cookies, CORS, correo ni MFA: solo define y valida su configuración.
 Maven resolvió Spring Boot 4.1.0, Spring Security JOSE 7.1.0 y java-totp 1.7.1. La compilación y
 las pruebas aisladas de propiedades, modularidad y Problem Details pasan.
 
+### Política de contraseñas implementada
+
+`PasswordPolicy` normaliza a NFC sin recortar la entrada y aplica, en orden determinista, presencia,
+límites de puntos de código Unicode y límite de bytes UTF-8. Las pruebas unitarias cubren ambos
+extremos de longitud, caracteres suplementarios, el límite de 72 bytes de BCrypt, precedencia de
+errores y ausencia de la contraseña rechazada en el mensaje de excepción.
+
+### Generación de tokens de verificación implementada
+
+`EmailVerificationTokenGenerator` crea 32 bytes mediante `SecureRandom`, los representa como
+Base64 URL-safe sin padding y calcula SHA-256 sobre esa representación textual. El valor original
+solo se usará para construir el correo; la persistencia recibe su hash de 32 bytes. Las pruebas
+unitarias fijan formato, entropía, vector SHA-256, correspondencia entre valor y hash, estados
+inválidos, copias defensivas y ausencia del token en errores.
+
 ## Continuidad
 
 Al retomar: leer `AGENTS.md`, `docs/roadmap.md`, este archivo y ADR-002; revisar `git status` y
 continuar en el bloque 2. Los DTO HTTP y el mapeo JPA de `email_verification_tokens` están
-preparados; el siguiente ejercicio es implementar por separado la normalización y la política de
-contraseñas antes de orquestar el registro. No es necesario releer todos los documentos.
+preparados; la política de contraseñas y la generación segura del token ya cuentan con pruebas. El
+siguiente ejercicio es encapsular BCrypt con el coste configurado; la blocklist se incorporará
+después y antes de orquestar el registro. No es necesario releer todos los documentos.

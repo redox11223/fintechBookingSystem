@@ -57,6 +57,6 @@ Pruebas E2E y de carga, accesibilidad, seguridad, contenedores, despliegue y run
 
 ## Próximo punto de control
 
-Implementar y revisar la normalización de entradas y la política configurable de contraseñas del
-registro. Después se incorporarán la generación y el hash del token, todavía sin orquestar el caso
-de uso completo.
+Implementar y revisar un componente BCrypt que use el coste externalizado y reciba contraseñas ya
+normalizadas. La política de contraseñas y la generación y hash del token de verificación ya están
+implementadas y probadas; todavía no se orquesta el caso de uso completo.

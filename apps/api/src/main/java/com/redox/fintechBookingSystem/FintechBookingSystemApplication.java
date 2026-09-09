@@ -5,6 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
 @SpringBootApplication
+//this scans for @ConfigurationProperties annotated classes and
+//registers them as beans in the Spring context
 @ConfigurationPropertiesScan
 public class FintechBookingSystemApplication {
 

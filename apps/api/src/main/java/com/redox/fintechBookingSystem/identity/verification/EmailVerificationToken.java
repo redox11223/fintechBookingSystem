@@ -4,7 +4,6 @@ import com.redox.fintechBookingSystem.identity.User;
 import com.redox.fintechBookingSystem.shared.audit.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
@@ -33,7 +32,7 @@ public class EmailVerificationToken extends BaseEntity {
 
   public EmailVerificationToken(User user, byte[] tokenHash, Instant expiresAt) {
     this.user = user;
-    this.tokenHash = tokenHash;
+    this.tokenHash = tokenHash.clone(); // Defensive copy to prevent external modification
     this.expiresAt = expiresAt;
   }
 }

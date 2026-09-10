@@ -14,7 +14,6 @@ import java.util.Set;
 @Entity
 @Getter @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "users")
 public class User extends BaseEntity {
   @Column(nullable = false,length = 254)

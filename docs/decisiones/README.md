@@ -9,6 +9,7 @@ implementación. Estados usados: `Propuesta`, `Aceptada`, `Reemplazada`.
 | [ADR-002](ADR-002-autenticacion-y-sesiones.md) | JWT breve y refresh token opaco rotativo | Aceptada |
 | [ADR-003](ADR-003-integridad-de-reservas.md) | Integridad concurrente de las citas en PostgreSQL | Aceptada |
 | [ADR-004](ADR-004-contrato-api.md) | OpenAPI code-first y errores Problem Details | Aceptada |
+| [ADR-005](ADR-005-topologia-de-despliegue-y-demo.md) | Web y API independientes bajo un mismo sitio | Aceptada |
 
 Para una nueva decisión, copia la estructura contexto → decisión → consecuencias y enlázala
 en esta tabla. Si cambia una decisión, crea otro ADR y marca el anterior como reemplazado.

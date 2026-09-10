@@ -17,6 +17,11 @@ public class PasswordPolicy {
     if(rawPassword == null || rawPassword.isBlank()) {
       throw new InvalidPasswordException(PasswordViolation.REQUIRED);
     }
+    // Normalize the password to NFC form to ensure consistent representation of Unicode characters
+    // becuase some Unicode characters can be represented in multiple ways.For example,the character
+    // "é" can be represented as a single code point (U+00E9) or as a combination of two code
+    // points (U+0065 U+0301). Normalizing to NFC ensures that all equivalent representations are
+    // treated the same way.
     String normalizedPassword = Normalizer.normalize(rawPassword, Normalizer.Form.NFC);
     int codePoints= normalizedPassword.codePointCount(0, normalizedPassword.length());
     int utf8Bytes = normalizedPassword.getBytes(StandardCharsets.UTF_8).length;

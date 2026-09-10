@@ -53,10 +53,11 @@ Paneles de cliente, agenda diaria/semanal del asesor y administración de catál
 
 ## Entrega 8 — Endurecimiento y demo (`PENDIENTE`)
 
-Pruebas E2E y de carga, accesibilidad, seguridad, contenedores, despliegue y runbook.
+Pruebas E2E y de carga, accesibilidad, seguridad, contenedores, despliegue y runbook. La demo usa
+cuentas sintéticas reiniciables y la topología acordada en ADR-005; Datadog se evaluará aquí.
 
 ## Próximo punto de control
 
-Implementar y revisar un componente BCrypt que use el coste externalizado y reciba contraseñas ya
-normalizadas. La política de contraseñas y la generación y hash del token de verificación ya están
-implementadas y probadas; todavía no se orquesta el caso de uso completo.
+Implementar y revisar el servicio de aplicación que orquesta el registro de un cliente, todavía sin
+controlador ni SMTP. La política, el `PasswordEncoder` y la generación y hash del token de
+verificación ya están implementados y probados. La blocklist se omite conscientemente en V1.

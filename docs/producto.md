@@ -63,6 +63,7 @@ nacional, adjuntos, ingresos, deudas, números de cuenta ni otra información fi
 
 ## Criterio de éxito del portafolio
 
-Una demostración desplegada con datos sintéticos debe cubrir el recorrido visitante → cliente
-→ reserva → gestión por asesor, y evidenciar diseño modular, integridad concurrente, seguridad,
-contratos API, pruebas automatizadas, observabilidad y decisiones justificadas.
+Una demostración desplegada con cuentas y datos sintéticos reiniciables debe cubrir el recorrido
+visitante → cliente → reserva → gestión por asesor, y evidenciar diseño modular, integridad
+concurrente, seguridad, contratos API, pruebas automatizadas, observabilidad y decisiones
+justificadas. No solicitará el correo ni otros datos personales del visitante.

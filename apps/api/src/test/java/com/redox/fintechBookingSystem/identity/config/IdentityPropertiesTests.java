@@ -50,6 +50,7 @@ class IdentityPropertiesTests {
 
       assertThat(policy.password().minCharacters()).isEqualTo(15);
       assertThat(policy.password().maxUtf8Bytes()).isEqualTo(72);
+      assertThat(policy.password().bcryptStrength()).isEqualTo(12);
       assertThat(policy.tokens().emailVerificationTtl()).isEqualTo(Duration.ofHours(24));
       assertThat(policy.session().refreshTokenTtl()).isEqualTo(Duration.ofDays(30));
       assertThat(policy.allowedOrigins()).containsExactly("http://localhost:5173");

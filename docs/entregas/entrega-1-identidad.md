@@ -51,7 +51,7 @@ explícita para la tarea concreta.
 - Verificación 24 horas, recuperación 30 minutos, invitación 72 horas y desafío MFA 5 minutos.
 - Bloqueo de 15 minutos después de 5 fallos dentro de una ventana de 15 minutos.
 - Refresh en cookie HttpOnly/SameSite Strict; protección CSRF para operaciones con cookie. La
-  relación de dominios entre web y API se fijará antes de implementar cookies, CORS y CSRF.
+  web y la API usarán orígenes distintos bajo el mismo sitio, conforme a ADR-005.
 - El bootstrap crea una invitación, nunca una contraseña ni un secreto versionado.
 - La entrega 1 usa SMTP directo. Outbox, reintentos y operación robusta pertenecen a la Entrega 5.
 
@@ -64,7 +64,7 @@ explícita para la tarea concreta.
 | Enumerar cuentas por la respuesta | Registro y reenvío usan el mismo `202` para correo nuevo o existente |
 | Asignarse un rol privilegiado | El request no contiene rol; el servidor asigna siempre `CLIENT` |
 | Crear duplicados bajo carrera | Normalización en aplicación e índice único sobre `lower(email)` como garantía final |
-| Exponer contraseñas si se filtra la base | BCrypt con salt, coste medido, blocklist y límite explícito de 72 bytes |
+| Exponer contraseñas si se filtra la base | BCrypt con salt, coste medido y límite explícito de 72 bytes |
 | Adivinar o reutilizar verificaciones | Token aleatorio de 256 bits, hash SHA-256 persistido, expiración y consumo atómico |
 | Consumir el token desde un escáner de correo | El enlace abre el frontend y este confirma mediante `POST`; la API no muta con `GET` |
 | Inyectar un host en el enlace | El origen del frontend viene de configuración, nunca del encabezado `Host` |
@@ -74,6 +74,11 @@ explícita para la tarea concreta.
 
 Riesgo aceptado para V1: el rate limiting perimetral por IP se completa en la Entrega 8. El
 bloqueo por cuenta del login sí pertenece a esta entrega.
+
+La V1 también omite deliberadamente la blocklist de contraseñas comunes. Se conserva el mínimo de
+15 caracteres y se recomendarán frases de contraseña, pero una contraseña larga y predecible aún
+podría aceptarse. Es una simplificación educativa y no una política recomendada para un sistema
+financiero real; la decisión se debe poder revisar antes de reutilizar el proyecto en producción.
 
 ### Contrato acordado
 
@@ -109,7 +114,7 @@ revocado o usado. El correo usa una URL configurada con fragmento, por ejemplo
 ### Secuencia transaccional esperada
 
 1. Validar y normalizar entrada; la contraseña se normaliza a NFC antes de medir caracteres y bytes.
-2. Comparar la contraseña completa contra la blocklist y calcular BCrypt.
+2. Aplicar la política de contraseña y calcular BCrypt sobre el valor normalizado.
 3. Crear `User`, rol `CLIENT`, `Client` y token de verificación en una sola transacción.
 4. Guardar solo el SHA-256 del token aleatorio.
 5. Enviar el correo después del commit; un fallo de SMTP no revierte la cuenta.
@@ -120,7 +125,7 @@ revocado o usado. El correo usa una URL configurada con fragmento, por ejemplo
 - Registro válido crea exactamente una cuenta, un rol `CLIENT`, un perfil y un token.
 - Mayúsculas del correo y peticiones concurrentes no crean duplicados.
 - Correo nuevo y existente son indistinguibles desde el contrato público.
-- Contraseñas débiles, fuera del rango o mayores de 72 bytes se rechazan sin truncamiento.
+- Contraseñas fuera del rango o mayores de 72 bytes se rechazan sin truncamiento.
 - Token válido funciona una vez; vencido, revocado, usado o aleatorio produce el mismo error.
 - Reenviar invalida el token anterior y respeta el enfriamiento.
 - Fallar SMTP no elimina datos confirmados y no expone secretos.
@@ -161,10 +166,18 @@ solo se usará para construir el correo; la persistencia recibe su hash de 32 by
 unitarias fijan formato, entropía, vector SHA-256, correspondencia entre valor y hash, estados
 inválidos, copias defensivas y ausencia del token en errores.
 
+### Codificación de contraseñas configurada
+
+El módulo de identidad expone un único `PasswordEncoder` basado en BCrypt y toma su coste de
+`IdentityProperties`, sin duplicar el valor en código. Las pruebas verifican el registro del bean,
+el uso del coste configurado, el salt diferente por codificación y la comprobación positiva y
+negativa de contraseñas.
+
 ## Continuidad
 
 Al retomar: leer `AGENTS.md`, `docs/roadmap.md`, este archivo y ADR-002; revisar `git status` y
 continuar en el bloque 2. Los DTO HTTP y el mapeo JPA de `email_verification_tokens` están
 preparados; la política de contraseñas y la generación segura del token ya cuentan con pruebas. El
-siguiente ejercicio es encapsular BCrypt con el coste configurado; la blocklist se incorporará
-después y antes de orquestar el registro. No es necesario releer todos los documentos.
+siguiente ejercicio es orquestar el registro de un cliente, sin controlador ni SMTP todavía.
+BCrypt ya está configurado mediante un `PasswordEncoder`; la blocklist se omite conscientemente en
+V1. No es necesario releer todos los documentos.

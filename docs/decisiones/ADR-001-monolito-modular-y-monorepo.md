@@ -23,6 +23,5 @@ de negocio y exponen únicamente una API explícita.
 - El monorepo permite cambios atómicos de contrato entre API y web.
 - Los límites requieren disciplina y pruebas; no ofrecen aislamiento de procesos.
 - Separar un módulo en el futuro será posible, pero no es una meta de V1.
-- El proveedor y la topología de producción se decidirán en un ADR posterior. Antes de implementar
-  refresh cookies se fijará si web y API compartirán sitio o usarán un proxy, porque esa elección
-  afecta SameSite, CORS y CSRF.
+- El proveedor y la topología de la demostración se concretan en ADR-005: web y API se despliegan
+  por separado, en orígenes distintos bajo un mismo sitio y sin un proxy intermedio.

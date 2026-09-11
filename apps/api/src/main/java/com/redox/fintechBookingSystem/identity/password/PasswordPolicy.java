@@ -23,6 +23,9 @@ public class PasswordPolicy {
     // points (U+0065 U+0301). Normalizing to NFC ensures that all equivalent representations are
     // treated the same way.
     String normalizedPassword = Normalizer.normalize(rawPassword, Normalizer.Form.NFC);
+    // codePoints counts the number of Unicode code points in the normalized password, which is
+    // important for accurately enforcing password length requirements, especially when dealing with
+    // characters outside the Basic Multilingual Plane (BMP) that may be represented by surrogate pairs in UTF-16.
     int codePoints= normalizedPassword.codePointCount(0, normalizedPassword.length());
     int utf8Bytes = normalizedPassword.getBytes(StandardCharsets.UTF_8).length;
     if (codePoints < identityPassword.minCharacters()) {

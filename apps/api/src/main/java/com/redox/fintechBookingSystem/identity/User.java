@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.time.OffsetDateTime;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -33,4 +34,9 @@ public class User extends BaseEntity {
 
   @Column(name = "is_active", nullable = false)
   private boolean isActive=true;
+
+  public void addRole(Roles role){
+    Objects.requireNonNull(role);
+    roles.add(role);
+  }
 }

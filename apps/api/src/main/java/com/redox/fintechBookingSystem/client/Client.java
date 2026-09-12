@@ -1,4 +1,4 @@
-package com.redox.fintechBookingSystem.customer;
+package com.redox.fintechBookingSystem.client;
 
 import com.redox.fintechBookingSystem.identity.User;
 import com.redox.fintechBookingSystem.shared.audit.BaseEntity;

@@ -29,7 +29,7 @@ compose.yaml   servicios locales
 ## Módulos objetivo del backend
 
 - `identity`: cuentas, roles, sesiones, verificación, recuperación y MFA.
-- `customer`: perfil mínimo del cliente.
+- `client`: perfil mínimo del cliente.
 - `organization`: sedes y configuración institucional.
 - `catalog`: categorías, servicios y políticas configurables.
 - `advisor`: perfil, competencias, horarios y ausencias.
@@ -45,10 +45,10 @@ de implementar el primer caso de uso que la requiera.
 
 ```text
 identity ───────────────────────────────→ shared
-customer ───────────────→ identity ────→ shared
+client ─────────────────→ identity ────→ shared
 advisor  ───────────────→ identity ────→ shared
 catalog  ───────────────────────────────→ shared
-booking  ─→ customer, advisor, catalog ─→ shared
+booking  ─→ client, advisor, catalog ─→ shared
 ```
 
 Spring Modulith verifica estas dependencias durante las pruebas. `shared` es temporalmente un

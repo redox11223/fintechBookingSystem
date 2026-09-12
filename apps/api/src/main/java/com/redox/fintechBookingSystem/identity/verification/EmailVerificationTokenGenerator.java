@@ -11,7 +11,7 @@ import java.util.Objects;
 
 @Component
 public class EmailVerificationTokenGenerator {
-  private final SecureRandom secureRandom=new SecureRandom();
+  private final SecureRandom secureRandom=new SecureRandom();//safe with concurrency by design
   private final static int TOKEN_ENTROPY_BYTES =32; //32 bytes = 256 bits
   private final static String HASH_ALGORITHM="SHA-256";
 

@@ -1,4 +1,4 @@
-package com.redox.fintechBookingSystem.customer.dto;
+package com.redox.fintechBookingSystem.client.dto;
 
 public record RegistrationAcceptedResponse(
         String message

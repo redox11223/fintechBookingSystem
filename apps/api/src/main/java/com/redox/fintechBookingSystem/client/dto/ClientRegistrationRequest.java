@@ -1,4 +1,4 @@
-package com.redox.fintechBookingSystem.customer.dto;
+package com.redox.fintechBookingSystem.client.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 import tools.jackson.databind.annotation.JsonDeserialize;
 import tools.jackson.databind.deser.jdk.StringDeserializer;
 
-public record RegisterCustomerRequest(
+public record ClientRegistrationRequest(
         @NotBlank(message = "The name can't be blank")
         @Size(min = 2,max = 120,message = "Name must be between 2 and 120 characters")
         String fullName,

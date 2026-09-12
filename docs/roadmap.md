@@ -58,6 +58,6 @@ cuentas sintéticas reiniciables y la topología acordada en ADR-005; Datadog se
 
 ## Próximo punto de control
 
-Implementar y revisar el servicio de aplicación que orquesta el registro de un cliente, todavía sin
-controlador ni SMTP. La política, el `PasswordEncoder` y la generación y hash del token de
-verificación ya están implementados y probados. La blocklist se omite conscientemente en V1.
+Diseñar e implementar el envío de verificación posterior al commit: conservar el token original
+solo en memoria, publicar una solicitud interna desde identidad y consumirla con el adaptador SMTP,
+todavía sin controlador HTTP. El registro de `User`, token y `Client` ya es atómico y está probado.

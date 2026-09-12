@@ -2,7 +2,7 @@ package com.redox.fintechBookingSystem.booking;
 
 import com.redox.fintechBookingSystem.advisor.Advisor;
 import com.redox.fintechBookingSystem.catalog.FinancialService;
-import com.redox.fintechBookingSystem.customer.Client;
+import com.redox.fintechBookingSystem.client.Client;
 import com.redox.fintechBookingSystem.shared.audit.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

@@ -173,11 +173,29 @@ El módulo de identidad expone un único `PasswordEncoder` basado en BCrypt y to
 el uso del coste configurado, el salt diferente por codificación y la comprobación positiva y
 negativa de contraseñas.
 
+### Registro pendiente de identidad implementado
+
+`IdentityRegistrationService` funciona como fachada pública del módulo: normaliza el correo,
+valida y codifica la contraseña antes de consultar su existencia, crea únicamente el rol `CLIENT`
+y persiste el usuario junto con el hash y la expiración del token en una transacción. Un `Clock`
+UTC inyectable hace determinista el cálculo temporal. Las pruebas unitarias verifican el orden de
+los controles contra enumeración, el camino de correo existente, la ausencia de escrituras ante
+entrada inválida, los datos persistidos y la expiración configurada.
+
+### Orquestación del registro de cliente implementada
+
+`ClientRegistrationService` coordina la fachada de identidad y la creación del perfil `Client`
+en una transacción común. Normaliza los espacios del nombre y los extremos del teléfono, y el
+camino de correo existente termina sin revelar el resultado ni crear otro perfil. Las pruebas
+unitarias cubren ambos caminos y los fallos previos a la persistencia; una prueba con PostgreSQL
+provoca un error al guardar el perfil y demuestra que también se revierten `User` y el token.
+
 ## Continuidad
 
 Al retomar: leer `AGENTS.md`, `docs/roadmap.md`, este archivo y ADR-002; revisar `git status` y
 continuar en el bloque 2. Los DTO HTTP y el mapeo JPA de `email_verification_tokens` están
-preparados; la política de contraseñas y la generación segura del token ya cuentan con pruebas. El
-siguiente ejercicio es orquestar el registro de un cliente, sin controlador ni SMTP todavía.
-BCrypt ya está configurado mediante un `PasswordEncoder`; la blocklist se omite conscientemente en
-V1. No es necesario releer todos los documentos.
+preparados; la política, BCrypt, la generación del token y la creación pendiente de identidad ya
+cuentan con pruebas. La orquestación ya crea `Client` atómicamente; el siguiente ejercicio es
+conservar el token original solo en memoria y solicitar el correo mediante un evento que se atienda
+después del commit, todavía sin controlador HTTP. La blocklist se omite conscientemente en V1. No
+es necesario releer todos los documentos.

@@ -31,7 +31,7 @@ explícita para la tarea concreta.
 | 1 | Escribir la migración Flyway a partir del diseño acordado | TÚ, con guía y revisión | TERMINADO |
 | 2 | Diseñar requests, respuestas y errores de registro/verificación | JUNTOS | TERMINADO |
 | 2 | Implementar registro, normalización y ciclo del token de verificación | TÚ, con guía y revisión | EN CURSO |
-| 2 | Preparar adaptador SMTP, pruebas y documentación OpenAPI | TÚ código; YO pruebas y documentación | PENDIENTE |
+| 2 | Preparar adaptador SMTP, pruebas y documentación OpenAPI | TÚ código; YO pruebas y documentación | EN CURSO |
 | 3 | Implementar login, bloqueo y emisión del access token | TÚ, con guía y revisión | PENDIENTE |
 | 3 | Implementar rotación, detección de reutilización y logout | TÚ, con guía y revisión | PENDIENTE |
 | 3 | Preparar cookies, CSRF, CORS y pruebas concurrentes | YO | PENDIENTE |
@@ -68,7 +68,7 @@ explícita para la tarea concreta.
 | Adivinar o reutilizar verificaciones | Token aleatorio de 256 bits, hash SHA-256 persistido, expiración y consumo atómico |
 | Consumir el token desde un escáner de correo | El enlace abre el frontend y este confirma mediante `POST`; la API no muta con `GET` |
 | Inyectar un host en el enlace | El origen del frontend viene de configuración, nunca del encabezado `Host` |
-| Filtrar secretos en observabilidad | Contraseñas y tokens no se incluyen en logs, eventos ni Problem Details |
+| Filtrar secretos en observabilidad | Contraseñas y tokens no se incluyen en logs, eventos persistidos/de auditoría ni Problem Details |
 | Perder el correo por fallo SMTP | La cuenta permanece y el usuario puede solicitar reenvío |
 | Abusar del reenvío | Enfriamiento de 60 segundos y respuesta pública genérica |
 
@@ -190,12 +190,27 @@ camino de correo existente termina sin revelar el resultado ni crear otro perfil
 unitarias cubren ambos caminos y los fallos previos a la persistencia; una prueba con PostgreSQL
 provoca un error al guardar el perfil y demuestra que también se revierten `User` y el token.
 
+### Solicitud y envío de verificación implementados
+
+Identidad publica `EmailVerificationRequested` después de registrar el hash del token. Es un
+evento interno, efímero y ejecutado en memoria; transporta el token original exclusivamente hasta
+el adaptador SMTP y redacta ese secreto de su representación textual. No es un evento persistido ni
+de auditoría.
+
+`EmailVerificationMailListener` atiende la solicitud con `AFTER_COMMIT`, construye desde
+configuración una URL del frontend con el token en el fragmento y envía un mensaje de texto mediante
+`JavaMailSender`. Un rollback descarta la notificación y un fallo SMTP posterior al commit se
+registra sin secretos y no revierte ni hace aparecer como fallido el registro confirmado. Para V1
+el procesamiento permanece síncrono y sin reintentos; asincronía, outbox y recuperación operativa
+pertenecen a la Entrega 5.
+
 ## Continuidad
 
 Al retomar: leer `AGENTS.md`, `docs/roadmap.md`, este archivo y ADR-002; revisar `git status` y
 continuar en el bloque 2. Los DTO HTTP y el mapeo JPA de `email_verification_tokens` están
 preparados; la política, BCrypt, la generación del token y la creación pendiente de identidad ya
 cuentan con pruebas. La orquestación ya crea `Client` atómicamente; el siguiente ejercicio es
-conservar el token original solo en memoria y solicitar el correo mediante un evento que se atienda
-después del commit, todavía sin controlador HTTP. La blocklist se omite conscientemente en V1. No
-es necesario releer todos los documentos.
+exponer el registro mediante `POST /api/v1/auth/register`, conservando la respuesta genérica `202`
+para correo nuevo o existente. El evento interno y el adaptador SMTP posterior al commit ya están
+implementados y cuentan con pruebas. La blocklist se omite conscientemente en V1. No es necesario
+releer todos los documentos.

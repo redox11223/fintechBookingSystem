@@ -31,7 +31,7 @@ explícita para la tarea concreta.
 | 1 | Escribir la migración Flyway a partir del diseño acordado | TÚ, con guía y revisión | TERMINADO |
 | 2 | Diseñar requests, respuestas y errores de registro/verificación | JUNTOS | TERMINADO |
 | 2 | Implementar registro, normalización y ciclo del token de verificación | TÚ, con guía y revisión | EN CURSO |
-| 2 | Preparar adaptador SMTP, pruebas y documentación OpenAPI | TÚ código; YO pruebas y documentación | EN CURSO |
+| 2 | Preparar adaptador SMTP, pruebas y documentación OpenAPI | TÚ código; YO pruebas y documentación | TERMINADO |
 | 3 | Implementar login, bloqueo y emisión del access token | TÚ, con guía y revisión | PENDIENTE |
 | 3 | Implementar rotación, detección de reutilización y logout | TÚ, con guía y revisión | PENDIENTE |
 | 3 | Preparar cookies, CSRF, CORS y pruebas concurrentes | YO | PENDIENTE |
@@ -204,13 +204,30 @@ registra sin secretos y no revierte ni hace aparecer como fallido el registro co
 el procesamiento permanece síncrono y sin reintentos; asincronía, outbox y recuperación operativa
 pertenecen a la Entrega 5.
 
+### Entrada HTTP de registro implementada
+
+`ClientRegistrationController`, como adaptador interno en `client.web`, expone
+`POST /api/v1/auth/register`, delega sin bifurcar la respuesta y devuelve el mismo `202 Accepted`
+para el resultado normal del servicio. Bean Validation produce `400` Problem Details antes de
+invocar el caso de uso. La operación tiene una excepción CSRF exacta porque no usa credenciales que
+el navegador adjunte automáticamente; esto no deshabilita CSRF globalmente ni anticipa la política
+de refresh/logout.
+
+OpenAPI documenta las respuestas `202` y `400`, y marca la contraseña como entrada `writeOnly` con
+formato `password`. Las pruebas web recorren la cadena de Spring Security sin inyectar un token
+CSRF, validan la delegación y el Problem Details estructural.
+
+Queda pendiente cerrar la carrera de dos registros simultáneos del mismo correo: el índice
+`uq_users_email_lower` garantiza que no haya duplicados, pero su violación debe transformarse de
+forma selectiva en la misma respuesta aceptada sin ocultar otras restricciones de integridad.
+
 ## Continuidad
 
 Al retomar: leer `AGENTS.md`, `docs/roadmap.md`, este archivo y ADR-002; revisar `git status` y
 continuar en el bloque 2. Los DTO HTTP y el mapeo JPA de `email_verification_tokens` están
 preparados; la política, BCrypt, la generación del token y la creación pendiente de identidad ya
-cuentan con pruebas. La orquestación ya crea `Client` atómicamente; el siguiente ejercicio es
-exponer el registro mediante `POST /api/v1/auth/register`, conservando la respuesta genérica `202`
-para correo nuevo o existente. El evento interno y el adaptador SMTP posterior al commit ya están
-implementados y cuentan con pruebas. La blocklist se omite conscientemente en V1. No es necesario
-releer todos los documentos.
+cuentan con pruebas. La orquestación ya crea `Client` atómicamente y el endpoint conserva la
+respuesta genérica para el camino secuencial. El siguiente ejercicio es manejar selectivamente la
+carrera perdida contra `uq_users_email_lower` y probar dos registros concurrentes; después se
+implementará la confirmación del correo. La blocklist se omite conscientemente en V1. No es
+necesario releer todos los documentos.

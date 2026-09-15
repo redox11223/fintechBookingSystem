@@ -39,6 +39,15 @@ class OpenApiIntegrationTests {
         .andExpect(jsonPath("$.openapi").isNotEmpty())
         .andExpect(jsonPath("$.info.title").value("CitaFin API"))
         .andExpect(jsonPath("$.info.version").value("v1"))
+        .andExpect(jsonPath("$.paths['/api/v1/auth/register'].post").exists())
+        .andExpect(jsonPath("$.paths['/api/v1/auth/register'].post.responses['202']").exists())
+        .andExpect(jsonPath("$.paths['/api/v1/auth/register'].post.responses['400']").exists())
+        .andExpect(jsonPath(
+            "$.components.schemas.ClientRegistrationRequest.properties.password.format")
+            .value("password"))
+        .andExpect(jsonPath(
+            "$.components.schemas.ClientRegistrationRequest.properties.password.writeOnly")
+            .value(true))
         .andExpect(jsonPath("$.paths['/api/v1/categories/{id}']").exists())
         .andExpect(jsonPath("$.paths['/api/v1/services/{id}']").exists());
   }

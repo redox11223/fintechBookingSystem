@@ -70,6 +70,9 @@ referencian a `User`, pero `User` no mantiene referencias inversas.
 ## API
 
 - REST JSON, documentada code-first con OpenAPI.
+- Los adaptadores HTTP viven en el subpaquete `web` del módulo propietario. El paquete base del
+  módulo se reserva para contratos Java que otros módulos necesiten; controllers, DTO HTTP,
+  repositorios e implementaciones permanecen internos salvo una necesidad explícita.
 - En desarrollo, el documento está en `/v3/api-docs` y Swagger UI en `/swagger-ui.html`; ambos se
   deshabilitan mediante el perfil `prod`.
 - Problem Details (RFC 9457) para errores uniformes.
@@ -83,6 +86,12 @@ El access token JWT vive solo en memoria del frontend. El refresh token es opaco
 se guarda en cookie HttpOnly/Secure. Las sesiones se pueden revocar. MFA TOTP es obligatorio
 para personal. Los endpoints públicos se limitan al catálogo y la disponibilidad necesarios
 para reservar; la autorización se valida en el servidor por recurso y rol.
+
+La V1 usa una sola `SecurityFilterChain`: una allowlist exacta identifica operaciones públicas y
+el resto requerirá autenticación. La ruta no sustituye la autorización: los roles protegen casos de
+uso y el servicio valida propiedad o asignación del recurso. Las operaciones sin credenciales
+ambientales, como registro, no requieren CSRF; las que usen la cookie refresh sí conservarán CSRF y
+validación de `Origin`.
 
 ## Operación prevista
 

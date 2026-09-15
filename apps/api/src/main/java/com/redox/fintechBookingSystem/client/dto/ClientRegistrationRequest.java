@@ -1,5 +1,6 @@
 package com.redox.fintechBookingSystem.client.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -18,6 +19,7 @@ public record ClientRegistrationRequest(
         String email,
 
         @NotBlank(message = "The password can't be blank")
+        @Schema(format = "password", accessMode = Schema.AccessMode.WRITE_ONLY)
         //this overrides the global TrimmingJsonDeserializer because we don't want to strip leading
         //and trailing spaces in passwords
         @JsonDeserialize(using = StringDeserializer.class)

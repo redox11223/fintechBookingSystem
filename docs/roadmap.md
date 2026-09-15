@@ -58,7 +58,8 @@ cuentas sintéticas reiniciables y la topología acordada en ADR-005; Datadog se
 
 ## Próximo punto de control
 
-Exponer el registro mediante `POST /api/v1/auth/register`: delegar en `ClientRegistrationService` y
-responder siempre `202 Accepted` con el mismo cuerpo para correo nuevo o existente, manteniendo los
-errores estructurales como Problem Details. El registro transaccional y el envío SMTP posterior al
-commit ya están implementados y probados.
+Cerrar el comportamiento concurrente de `POST /api/v1/auth/register`: si dos solicitudes del mismo
+correo superan simultáneamente la prevalidación, reconocer solo la violación de
+`uq_users_email_lower`, revertir limpiamente la transacción perdedora y devolver el mismo
+`202 Accepted`. Otras violaciones de integridad no deben ocultarse. Añadir una prueba concurrente
+con PostgreSQL antes de avanzar a la confirmación del correo.

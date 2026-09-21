@@ -1,5 +1,6 @@
 package com.redox.fintechBookingSystem.shared.exception;
 
+import com.redox.fintechBookingSystem.shared.utils.ProblemDetailsGenerator;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.*;
 import org.springframework.validation.FieldError;
@@ -23,7 +24,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(ResourceNotFoundException.class)
   public ResponseEntity<ProblemDetail> handleResourceNotFound(ResourceNotFoundException ex,
                                                               HttpServletRequest request) {
-    ProblemDetail response = generateProblemDetail(HttpStatus.NOT_FOUND,
+    ProblemDetail response = ProblemDetailsGenerator.generate(HttpStatus.NOT_FOUND,
             ex.getMessage(),
             URI.create("https://api.citafin.dev/problems/resource-not-found"),
             "Resource not found",
@@ -35,7 +36,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(DuplicateResourceException.class)
   public ResponseEntity<ProblemDetail> handleDuplicateResource(DuplicateResourceException ex,
                                                                HttpServletRequest request) {
-    ProblemDetail response = generateProblemDetail(HttpStatus.CONFLICT,
+    ProblemDetail response = ProblemDetailsGenerator.generate(HttpStatus.CONFLICT,
             ex.getMessage(),
             URI.create("https://api.citafin.dev/problems/duplicate-resource"),
             "Duplicate resource",
@@ -70,30 +71,5 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             ));
     problemDetail.setProperty("errors", errors);
     return super.handleMethodArgumentNotValid(ex, headers, status, request);
-  }
-
-  /**
-   * Generates a ProblemDetail instance with the specified parameters.
-   *
-   * @param status   The HTTP status.
-   * @param detail   The detail message.
-   * @param type     The type of the problem.
-   * @param title    The title of the problem.
-   * @param instance The instance of the problem.
-   * @param code     The code of the problem.
-   * @return A ProblemDetail instance.
-   */
-  private ProblemDetail generateProblemDetail(HttpStatus status,
-                                              String detail,
-                                              URI type,
-                                              String title,
-                                              URI instance,
-                                              String code) {
-    ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(status, detail);
-    problemDetail.setType(type);
-    problemDetail.setTitle(title);
-    problemDetail.setInstance(instance);
-    problemDetail.setProperty("code", code);
-    return problemDetail;
   }
 }

@@ -18,7 +18,9 @@ public class SecurityConfig {
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
     return http
             .csrf(csrf -> csrf.ignoringRequestMatchers(
-                    pathPattern(HttpMethod.POST, "/api/v1/auth/register")))
+                    pathPattern(HttpMethod.POST, "/api/v1/auth/register"),
+                    pathPattern(HttpMethod.POST, "/api/v1/auth/email-verifications/confirm")
+                    ))
             .sessionManagement(session ->
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth ->

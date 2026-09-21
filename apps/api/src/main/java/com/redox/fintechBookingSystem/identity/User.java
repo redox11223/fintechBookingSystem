@@ -2,12 +2,11 @@ package com.redox.fintechBookingSystem.identity;
 
 import com.redox.fintechBookingSystem.shared.audit.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -30,7 +29,7 @@ public class User extends BaseEntity {
   private Set<Roles> roles = new HashSet<>();
 
   @Column(name = "email_verified_at")
-  private OffsetDateTime emailVerifiedAt;
+  private Instant emailVerifiedAt;
 
   @Column(name = "is_active", nullable = false)
   private boolean isActive=true;

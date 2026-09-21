@@ -58,8 +58,8 @@ cuentas sintéticas reiniciables y la topología acordada en ADR-005; Datadog se
 
 ## Próximo punto de control
 
-Cerrar el comportamiento concurrente de `POST /api/v1/auth/register`: si dos solicitudes del mismo
-correo superan simultáneamente la prevalidación, reconocer solo la violación de
-`uq_users_email_lower`, revertir limpiamente la transacción perdedora y devolver el mismo
-`202 Accepted`. Otras violaciones de integridad no deben ocultarse. Añadir una prueba concurrente
-con PostgreSQL antes de avanzar a la confirmación del correo.
+Implementar `POST /api/v1/auth/email-verifications/confirm`: calcular el hash SHA-256 del token
+recibido, bloquear y validar el registro correspondiente, consumirlo una sola vez y establecer
+`email_verified_at` en la misma transacción. Token desconocido, vencido, revocado o consumido debe
+producir el mismo `400` con código `EMAIL_VERIFICATION_TOKEN_INVALID`; el camino válido devuelve
+`204 No Content`.

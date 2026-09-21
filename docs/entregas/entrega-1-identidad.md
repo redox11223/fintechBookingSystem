@@ -217,9 +217,12 @@ OpenAPI documenta las respuestas `202` y `400`, y marca la contraseña como entr
 formato `password`. Las pruebas web recorren la cadena de Spring Security sin inyectar un token
 CSRF, validan la delegación y el Problem Details estructural.
 
-Queda pendiente cerrar la carrera de dos registros simultáneos del mismo correo: el índice
-`uq_users_email_lower` garantiza que no haya duplicados, pero su violación debe transformarse de
-forma selectiva en la misma respuesta aceptada sin ocultar otras restricciones de integridad.
+La carrera de dos registros simultáneos queda cerrada mediante un límite transaccional separado y
+un `flush` explícito. La fachada reconoce exclusivamente SQLSTATE `23505` sobre
+`uq_users_email_lower` después del rollback; las demás violaciones continúan propagándose. Una
+prueba concurrente con PostgreSQL sincroniza ambas prevalidaciones y demuestra que las dos
+solicitudes terminan normalmente, pero solo persisten una cuenta, un rol, un perfil y un token, y
+solo se envía un correo.
 
 ## Continuidad
 
@@ -227,7 +230,8 @@ Al retomar: leer `AGENTS.md`, `docs/roadmap.md`, este archivo y ADR-002; revisar
 continuar en el bloque 2. Los DTO HTTP y el mapeo JPA de `email_verification_tokens` están
 preparados; la política, BCrypt, la generación del token y la creación pendiente de identidad ya
 cuentan con pruebas. La orquestación ya crea `Client` atómicamente y el endpoint conserva la
-respuesta genérica para el camino secuencial. El siguiente ejercicio es manejar selectivamente la
-carrera perdida contra `uq_users_email_lower` y probar dos registros concurrentes; después se
-implementará la confirmación del correo. La blocklist se omite conscientemente en V1. No es
+respuesta genérica tanto para el camino secuencial como para la carrera concurrente. El siguiente
+ejercicio es implementar la confirmación atómica del correo: localizar por hash con bloqueo,
+rechazar de forma uniforme tokens desconocidos, vencidos, revocados o consumidos, y actualizar en
+una transacción el token y `email_verified_at`. La blocklist se omite conscientemente en V1. No es
 necesario releer todos los documentos.

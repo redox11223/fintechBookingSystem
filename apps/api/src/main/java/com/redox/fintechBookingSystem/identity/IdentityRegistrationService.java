@@ -44,12 +44,8 @@ public class IdentityRegistrationService {
     if(userRepo.existsByEmail(formattedEmail)){
       return Optional.empty();
     }
-    User newUser=new User();
-    newUser.setEmail(formattedEmail);
-    newUser.setPassword(hashedPassword);
+    User newUser=new User(formattedEmail,hashedPassword);
     newUser.addRole(Roles.CLIENT);
-    newUser.setEmailVerifiedAt(null);
-    newUser.setActive(true);
     User savedUser= userRepo.save(newUser);
 
     GeneratedEmailVerificationToken verificationToken=tokenGenerator.generate();

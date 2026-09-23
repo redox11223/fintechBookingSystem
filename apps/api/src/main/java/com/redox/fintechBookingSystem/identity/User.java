@@ -2,6 +2,7 @@ package com.redox.fintechBookingSystem.identity;
 
 import com.redox.fintechBookingSystem.shared.audit.BaseEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,13 +30,25 @@ public class User extends BaseEntity {
   private Set<Roles> roles = new HashSet<>();
 
   @Column(name = "email_verified_at")
+  @Setter(AccessLevel.NONE)
   private Instant emailVerifiedAt;
 
   @Column(name = "is_active", nullable = false)
-  private boolean isActive=true;
+  private boolean isActive;
+
+  public User(String email,String password){
+    this.email=email;
+    this.password=password;
+    this.emailVerifiedAt=null;
+    this.isActive=true;
+  }
 
   public void addRole(Roles role){
     Objects.requireNonNull(role);
     roles.add(role);
+  }
+  public void verifyEmailAt(Instant time){
+    Objects.requireNonNull(time);
+    this.emailVerifiedAt=time;
   }
 }

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.net.URI;
 
-@RestControllerAdvice
+@RestControllerAdvice(basePackageClasses = EmailVerificationController.class)
 class IdentityExceptionHandler{
   @ExceptionHandler(InvalidEmailVerificationTokenException.class)
   ResponseEntity<ProblemDetail> handleInvalidEmailVerificationToken(InvalidEmailVerificationTokenException ex,

@@ -26,6 +26,6 @@ public class EmailVerificationConfirmationService {
             .orElseThrow(InvalidEmailVerificationTokenException::new);
     User user=userRepo.findById(userId)
             .orElseThrow(InvalidEmailVerificationTokenException::new);
-    user.setEmailVerifiedAt(now);
+    user.verifyEmailAt(now);
   }
 }

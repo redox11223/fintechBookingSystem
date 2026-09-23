@@ -5,6 +5,8 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -14,6 +16,7 @@ class EmailVerificationTokenConsumptionRepo {
   private final JdbcClient jdbcClient;
 
   Optional<UUID> consumeIfValid(byte[] tokenHash, Instant now){
+    OffsetDateTime databaseTimestamp = OffsetDateTime.ofInstant(now, ZoneOffset.UTC);
     String sql="""
         UPDATE email_verification_tokens
         SET consumed_at = :now,
@@ -26,7 +29,7 @@ class EmailVerificationTokenConsumptionRepo {
       """;
     return jdbcClient.sql(sql)
             .param("token_hash",tokenHash)
-            .param("now",now)
+            .param("now",databaseTimestamp)
             .query(UUID.class)
             .optional();
   }

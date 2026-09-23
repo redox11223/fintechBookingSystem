@@ -118,7 +118,8 @@ revocado o usado. El correo usa una URL configurada con fragmento, por ejemplo
 3. Crear `User`, rol `CLIENT`, `Client` y token de verificación en una sola transacción.
 4. Guardar solo el SHA-256 del token aleatorio.
 5. Enviar el correo después del commit; un fallo de SMTP no revierte la cuenta.
-6. Al confirmar, bloquear/consumir el token y establecer `email_verified_at` atómicamente.
+6. Al confirmar, consumir condicionalmente el token y establecer `email_verified_at` en la misma
+   transacción.
 
 ### Criterios de aceptación del flujo
 
@@ -224,14 +225,33 @@ prueba concurrente con PostgreSQL sincroniza ambas prevalidaciones y demuestra q
 solicitudes terminan normalmente, pero solo persisten una cuenta, un rol, un perfil y un token, y
 solo se envía un correo.
 
+### Confirmación de correo implementada
+
+`EmailVerificationController` expone `POST /api/v1/auth/email-verifications/confirm`, permite esta
+operación sin token CSRF porque todavía no usa credenciales adjuntadas automáticamente y devuelve
+`204 No Content`. El token se documenta como entrada `writeOnly` en OpenAPI. Un token desconocido,
+vencido, revocado o consumido produce el mismo `400` Problem Details con código estable
+`EMAIL_VERIFICATION_TOKEN_INVALID`.
+
+La persistencia usa un único `UPDATE ... WHERE ... RETURNING user_id`: la condición valida el
+estado y el mismo statement reclama el token. Si dos transacciones compiten, PostgreSQL bloquea la
+fila durante la actualización; después del commit ganador vuelve a evaluar la condición para la
+segunda, que actualiza cero filas. Así se evita una ventana entre leer y escribir sin añadir
+`@Version` ni mantener un bloqueo pesimista explícito. El servicio actualiza `email_verified_at`
+con el mismo `Instant` y dentro de la misma transacción, por lo que cualquier fallo posterior
+revierte también el consumo.
+
+Las pruebas cubren la orquestación con reloj fijo, validación web, Problem Details, OpenAPI, los
+cuatro estados inválidos y dos confirmaciones simultáneas sobre PostgreSQL real. La integración
+también detectó que PgJDBC no enlaza `Instant` directamente mediante `JdbcClient`; el adaptador lo
+convierte a `OffsetDateTime` UTC al escribir `TIMESTAMPTZ`, manteniendo `Instant` en el dominio.
+
 ## Continuidad
 
 Al retomar: leer `AGENTS.md`, `docs/roadmap.md`, este archivo y ADR-002; revisar `git status` y
-continuar en el bloque 2. Los DTO HTTP y el mapeo JPA de `email_verification_tokens` están
-preparados; la política, BCrypt, la generación del token y la creación pendiente de identidad ya
-cuentan con pruebas. La orquestación ya crea `Client` atómicamente y el endpoint conserva la
-respuesta genérica tanto para el camino secuencial como para la carrera concurrente. El siguiente
-ejercicio es implementar la confirmación atómica del correo: localizar por hash con bloqueo,
-rechazar de forma uniforme tokens desconocidos, vencidos, revocados o consumidos, y actualizar en
-una transacción el token y `email_verified_at`. La blocklist se omite conscientemente en V1. No es
+continuar en el bloque 2. Registro y confirmación de correo ya tienen cobertura unitaria, web y de
+concurrencia sobre PostgreSQL. El siguiente ejercicio es el reenvío: mantener el `202` genérico,
+aplicar el enfriamiento de 60 segundos y reemplazar atómicamente el token abierto solo para una
+cuenta existente todavía no verificada. Debe definirse y probarse el resultado de dos reenvíos
+concurrentes antes de cerrar el ciclo del token. La blocklist se omite conscientemente en V1. No es
 necesario releer todos los documentos.

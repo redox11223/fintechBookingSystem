@@ -48,6 +48,18 @@ class OpenApiIntegrationTests {
         .andExpect(jsonPath(
             "$.components.schemas.ClientRegistrationRequest.properties.password.writeOnly")
             .value(true))
+        .andExpect(jsonPath(
+            "$.paths['/api/v1/auth/email-verifications/confirm'].post.responses['204']")
+            .exists())
+        .andExpect(jsonPath(
+            "$.paths['/api/v1/auth/email-verifications/confirm'].post.responses['400']")
+            .exists())
+        .andExpect(jsonPath(
+            "$.components.schemas.ConfirmVerificationEmailRequest.properties.token.format")
+            .value("password"))
+        .andExpect(jsonPath(
+            "$.components.schemas.ConfirmVerificationEmailRequest.properties.token.writeOnly")
+            .value(true))
         .andExpect(jsonPath("$.paths['/api/v1/categories/{id}']").exists())
         .andExpect(jsonPath("$.paths['/api/v1/services/{id}']").exists());
   }

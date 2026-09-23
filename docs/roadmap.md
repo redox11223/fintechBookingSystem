@@ -58,8 +58,8 @@ cuentas sintéticas reiniciables y la topología acordada en ADR-005; Datadog se
 
 ## Próximo punto de control
 
-Implementar `POST /api/v1/auth/email-verifications/confirm`: calcular el hash SHA-256 del token
-recibido, bloquear y validar el registro correspondiente, consumirlo una sola vez y establecer
-`email_verified_at` en la misma transacción. Token desconocido, vencido, revocado o consumido debe
-producir el mismo `400` con código `EMAIL_VERIFICATION_TOKEN_INVALID`; el camino válido devuelve
-`204 No Content`.
+Implementar `POST /api/v1/auth/email-verifications/resend`: conservar la respuesta pública
+genérica `202 Accepted`, no revelar si la cuenta existe o ya está verificada, aplicar el
+enfriamiento de 60 segundos y, cuando corresponda, revocar el token abierto antes de crear y
+enviar uno nuevo. Probar especialmente dos reenvíos concurrentes para que el índice parcial
+`uq_email_verification_tokens_open_user` siga garantizando como máximo un token abierto.

@@ -1,6 +1,7 @@
 package com.redox.fintechBookingSystem.identity.web;
 
 import com.redox.fintechBookingSystem.identity.verification.EmailVerificationConfirmationService;
+import com.redox.fintechBookingSystem.identity.verification.EmailResendService;
 import com.redox.fintechBookingSystem.identity.verification.InvalidEmailVerificationTokenException;
 import com.redox.fintechBookingSystem.shared.config.SecurityConfig;
 import com.redox.fintechBookingSystem.shared.exception.GlobalExceptionHandler;
@@ -27,6 +28,7 @@ class EmailVerificationControllerTests {
 
   @Autowired private MockMvc mockMvc;
   @MockitoBean private EmailVerificationConfirmationService confirmationService;
+  @MockitoBean private EmailResendService resendService;
 
   @Test
   void confirmsValidTokenWithoutCsrfAndReturnsNoContent() throws Exception {
@@ -75,5 +77,34 @@ class EmailVerificationControllerTests {
         .andExpect(jsonPath("$.errors.token").isArray());
 
     verifyNoInteractions(confirmationService);
+  }
+
+  @Test
+  void acceptsResendWithoutCsrfAndReturnsGenericResponse() throws Exception {
+    mockMvc.perform(post("/api/v1/auth/email-verifications/resend")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {"email": "CLIENT@example.com"}
+                """))
+        .andExpect(status().isAccepted())
+        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.message").value("Verification Email request accepted"));
+
+    verify(resendService).resend("CLIENT@example.com");
+  }
+
+  @Test
+  void rejectsInvalidResendEmailBeforeCallingService() throws Exception {
+    mockMvc.perform(post("/api/v1/auth/email-verifications/resend")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {"email": "not-an-email"}
+                """))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+        .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
+        .andExpect(jsonPath("$.errors.email").isArray());
+
+    verifyNoInteractions(resendService);
   }
 }

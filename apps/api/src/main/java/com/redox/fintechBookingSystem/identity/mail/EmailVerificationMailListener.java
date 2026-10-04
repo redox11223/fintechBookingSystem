@@ -34,7 +34,7 @@ public class EmailVerificationMailListener {
     try {
       mailSender.send(mailMessage);
     } catch (MailException e) {
-      log.warn( "Email verification message could not be sent after registration ({})",
+      log.warn( "Email verification message could not be sent ({})",
               e.getClass().getSimpleName());
     }
 

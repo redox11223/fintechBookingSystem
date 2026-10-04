@@ -30,7 +30,7 @@ explícita para la tarea concreta.
 | 1 | Diseñar tablas, constraints e índices de identidad | JUNTOS | TERMINADO |
 | 1 | Escribir la migración Flyway a partir del diseño acordado | TÚ, con guía y revisión | TERMINADO |
 | 2 | Diseñar requests, respuestas y errores de registro/verificación | JUNTOS | TERMINADO |
-| 2 | Implementar registro, normalización y ciclo del token de verificación | TÚ, con guía y revisión | EN CURSO |
+| 2 | Implementar registro, normalización y ciclo del token de verificación | TÚ, con guía y revisión | TERMINADO |
 | 2 | Preparar adaptador SMTP, pruebas y documentación OpenAPI | TÚ código; YO pruebas y documentación | TERMINADO |
 | 3 | Implementar login, bloqueo y emisión del access token | TÚ, con guía y revisión | PENDIENTE |
 | 3 | Implementar rotación, detección de reutilización y logout | TÚ, con guía y revisión | PENDIENTE |
@@ -246,12 +246,30 @@ cuatro estados inválidos y dos confirmaciones simultáneas sobre PostgreSQL rea
 también detectó que PgJDBC no enlaza `Instant` directamente mediante `JdbcClient`; el adaptador lo
 convierte a `OffsetDateTime` UTC al escribir `TIMESTAMPTZ`, manteniendo `Instant` en el dominio.
 
+### Reenvío de verificación implementado
+
+`POST /api/v1/auth/email-verifications/resend` normaliza el correo y conserva una respuesta
+genérica `202 Accepted` para cuentas inexistentes, verificadas, dentro del enfriamiento o
+procesadas. La validación estructural continúa produciendo `400` Problem Details. La operación es
+una excepción CSRF exacta y su contrato está incluido en OpenAPI.
+
+El servicio toma un bloqueo pesimista sobre la fila del usuario durante la decisión de reemplazo.
+Para una cuenta no verificada, localiza el único token abierto y compara su creación con el
+enfriamiento configurado. Cuando corresponde, lo revoca y fuerza un `flush` antes de insertar el
+nuevo; así el token anterior sale primero del índice parcial
+`uq_email_verification_tokens_open_user`. El evento de correo se publica dentro de la transacción,
+pero el listener SMTP actúa después del commit.
+
+Las pruebas unitarias fijan reloj, TTL, cooldown, normalización, orden `flush`/`save` y publicación
+del evento. Las pruebas web comprueban `202`, validación y CSRF. Una prueba con PostgreSQL real
+demuestra que dos reenvíos concurrentes terminan normalmente, pero solo crean un token nuevo y
+envían un correo.
+
 ## Continuidad
 
 Al retomar: leer `AGENTS.md`, `docs/roadmap.md`, este archivo y ADR-002; revisar `git status` y
-continuar en el bloque 2. Registro y confirmación de correo ya tienen cobertura unitaria, web y de
-concurrencia sobre PostgreSQL. El siguiente ejercicio es el reenvío: mantener el `202` genérico,
-aplicar el enfriamiento de 60 segundos y reemplazar atómicamente el token abierto solo para una
-cuenta existente todavía no verificada. Debe definirse y probarse el resultado de dos reenvíos
-concurrentes antes de cerrar el ciclo del token. La blocklist se omite conscientemente en V1. No es
-necesario releer todos los documentos.
+continuar en el bloque 3. Registro, confirmación y reenvío ya cuentan con pruebas unitarias, web y
+de concurrencia sobre PostgreSQL. El siguiente trabajo conjunto es diseñar el contrato y el modelo
+de bloqueo del login antes de implementar credenciales, emisión del access JWT y sesiones refresh.
+La blocklist de contraseñas se omite conscientemente en V1. No es necesario releer todos los
+documentos.

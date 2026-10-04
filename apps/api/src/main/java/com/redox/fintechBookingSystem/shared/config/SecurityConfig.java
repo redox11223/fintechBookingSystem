@@ -19,7 +19,8 @@ public class SecurityConfig {
     return http
             .csrf(csrf -> csrf.ignoringRequestMatchers(
                     pathPattern(HttpMethod.POST, "/api/v1/auth/register"),
-                    pathPattern(HttpMethod.POST, "/api/v1/auth/email-verifications/confirm")
+                    pathPattern(HttpMethod.POST, "/api/v1/auth/email-verifications/confirm"),
+                    pathPattern(HttpMethod.POST, "/api/v1/auth/email-verifications/resend")
                     ))
             .sessionManagement(session ->
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

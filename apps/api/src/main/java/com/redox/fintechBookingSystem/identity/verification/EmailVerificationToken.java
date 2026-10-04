@@ -5,8 +5,10 @@ import com.redox.fintechBookingSystem.shared.audit.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.Instant;
+import java.util.Objects;
 
 //internal entity to store email verification tokens.
 //The token itself is not stored, only its hash for security reasons.
@@ -27,6 +29,7 @@ public class EmailVerificationToken extends BaseEntity {
   @Column(name = "consumed_at")
   private Instant consumedAt;
 
+  @Setter(AccessLevel.NONE)
   @Column(name = "revoked_at")
   private Instant revokedAt;
 
@@ -34,5 +37,13 @@ public class EmailVerificationToken extends BaseEntity {
     this.user = user;
     this.tokenHash = tokenHash.clone(); // Defensive copy to prevent external modification
     this.expiresAt = expiresAt;
+  }
+
+  public void revokeAt(Instant revokedTime){
+    Objects.requireNonNull(revokedTime,"Revocation time is required");
+    if(revokedAt!=null || consumedAt!=null){
+      throw new IllegalStateException("Only an open token can be revoked");
+    }
+    this.revokedAt=revokedTime;
   }
 }

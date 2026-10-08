@@ -2,12 +2,14 @@ package com.redox.fintechBookingSystem.identity;
 
 import com.redox.fintechBookingSystem.identity.config.IdentityProperties;
 import com.redox.fintechBookingSystem.identity.password.PasswordPolicy;
-import com.redox.fintechBookingSystem.identity.repo.UserRepo;
+import com.redox.fintechBookingSystem.identity.user.Roles;
+import com.redox.fintechBookingSystem.identity.user.User;
+import com.redox.fintechBookingSystem.identity.user.UserRepo;
 import com.redox.fintechBookingSystem.identity.verification.EmailVerificationRequested;
 import com.redox.fintechBookingSystem.identity.verification.EmailVerificationToken;
-import com.redox.fintechBookingSystem.identity.verification.EmailVerificationTokenGenerator;
+import com.redox.fintechBookingSystem.identity.token.SecureTokenGenerator;
 import com.redox.fintechBookingSystem.identity.verification.EmailVerificationTokenRepo;
-import com.redox.fintechBookingSystem.identity.verification.GeneratedEmailVerificationToken;
+import com.redox.fintechBookingSystem.identity.token.GeneratedSecureToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,7 +28,7 @@ import java.util.Optional;
 public class IdentityRegistrationService {
   private final UserRepo userRepo;
   private final PasswordPolicy passwordPolicy;
-  private final EmailVerificationTokenGenerator tokenGenerator;
+  private final SecureTokenGenerator tokenGenerator;
   private final PasswordEncoder passwordEncoder;
   private final IdentityProperties identityProperties;
   private final EmailVerificationTokenRepo verificationTokenRepo;
@@ -48,7 +50,7 @@ public class IdentityRegistrationService {
     newUser.addRole(Roles.CLIENT);
     User savedUser= userRepo.save(newUser);
 
-    GeneratedEmailVerificationToken verificationToken=tokenGenerator.generate();
+    GeneratedSecureToken verificationToken=tokenGenerator.generate();
     Instant tokenExpiration=getTokenExpirationDate(identityProperties.tokens().emailVerificationTtl());
     EmailVerificationToken emailVerificationToken=new EmailVerificationToken(
             savedUser,verificationToken.tokenHash(), tokenExpiration);

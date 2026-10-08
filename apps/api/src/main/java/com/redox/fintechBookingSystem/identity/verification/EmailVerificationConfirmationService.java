@@ -1,7 +1,8 @@
 package com.redox.fintechBookingSystem.identity.verification;
 
-import com.redox.fintechBookingSystem.identity.User;
-import com.redox.fintechBookingSystem.identity.repo.UserRepo;
+import com.redox.fintechBookingSystem.identity.token.SecureTokenGenerator;
+import com.redox.fintechBookingSystem.identity.user.User;
+import com.redox.fintechBookingSystem.identity.user.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +14,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class EmailVerificationConfirmationService {
-  private final EmailVerificationTokenGenerator tokenGenerator;
+  private final SecureTokenGenerator tokenGenerator;
   private final EmailVerificationTokenConsumptionRepo tokenConsumptionRepo;
   private final UserRepo userRepo;
   private final Clock clock;

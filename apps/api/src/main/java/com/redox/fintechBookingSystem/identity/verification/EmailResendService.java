@@ -1,8 +1,10 @@
 package com.redox.fintechBookingSystem.identity.verification;
 
-import com.redox.fintechBookingSystem.identity.User;
+import com.redox.fintechBookingSystem.identity.token.GeneratedSecureToken;
+import com.redox.fintechBookingSystem.identity.token.SecureTokenGenerator;
+import com.redox.fintechBookingSystem.identity.user.User;
 import com.redox.fintechBookingSystem.identity.config.IdentityProperties;
-import com.redox.fintechBookingSystem.identity.repo.UserRepo;
+import com.redox.fintechBookingSystem.identity.user.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -19,7 +21,7 @@ public class EmailResendService {
   private final UserRepo userRepo;
   private final EmailVerificationTokenRepo tokenRepo;
   private final IdentityProperties identityProperties;
-  private final EmailVerificationTokenGenerator tokenGenerator;
+  private final SecureTokenGenerator tokenGenerator;
   private final Clock clock;
   private final ApplicationEventPublisher eventPublisher;
 
@@ -45,7 +47,7 @@ public class EmailResendService {
       verificationToken.get().revokeAt(now);
       tokenRepo.flush();
     }
-    GeneratedEmailVerificationToken newVerificationToken=tokenGenerator.generate();
+    GeneratedSecureToken newVerificationToken=tokenGenerator.generate();
     Instant tokenExpiredTime=now.plus(identityProperties.tokens().emailVerificationTtl());
     EmailVerificationToken newEmailVerificationToken= new EmailVerificationToken(
             user, newVerificationToken.tokenHash(), tokenExpiredTime);

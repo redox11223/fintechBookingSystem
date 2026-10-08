@@ -1,6 +1,5 @@
-package com.redox.fintechBookingSystem.identity.repo;
+package com.redox.fintechBookingSystem.identity.user;
 
-import com.redox.fintechBookingSystem.identity.User;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;

@@ -10,17 +10,17 @@ import java.util.Base64;
 import java.util.Objects;
 
 @Component
-public class EmailVerificationTokenGenerator {
+public class SecureTokenGenerator {
   private final SecureRandom secureRandom=new SecureRandom();//safe with concurrency by design
   private final static int TOKEN_ENTROPY_BYTES =32; //32 bytes = 256 bits
   private final static String HASH_ALGORITHM="SHA-256";
 
-  public GeneratedEmailVerificationToken generate(){
+  public GeneratedSecureToken generate(){
     byte[] randomBytes=new byte[TOKEN_ENTROPY_BYTES];
     secureRandom.nextBytes(randomBytes);
     String rawToken=Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes);
     byte[] tokenHash=hash(rawToken);
-    return new GeneratedEmailVerificationToken(rawToken,tokenHash);
+    return new GeneratedSecureToken(rawToken,tokenHash);
   }
   //this method is used to hash the token before storing it in the database for security reasons
   // and also to compare the token provided by the user with the one stored in the database.

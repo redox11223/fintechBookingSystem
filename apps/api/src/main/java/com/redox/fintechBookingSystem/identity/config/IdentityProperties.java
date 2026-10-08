@@ -55,7 +55,9 @@ public record IdentityProperties(
       @NotNull Duration accessTokenTtl,
       @NotNull Duration refreshTokenTtl,
       @NotBlank String refreshCookieName,
-      boolean secureCookie
+      boolean secureCookie,
+      @NotBlank String issuer,
+      @NotBlank String audience
   ) {
   }
 

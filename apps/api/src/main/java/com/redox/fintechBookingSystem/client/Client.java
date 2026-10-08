@@ -1,6 +1,6 @@
 package com.redox.fintechBookingSystem.client;
 
-import com.redox.fintechBookingSystem.identity.User;
+import com.redox.fintechBookingSystem.identity.user.User;
 import com.redox.fintechBookingSystem.shared.audit.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

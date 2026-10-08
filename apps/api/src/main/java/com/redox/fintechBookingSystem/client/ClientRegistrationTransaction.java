@@ -3,7 +3,7 @@ package com.redox.fintechBookingSystem.client;
 import com.redox.fintechBookingSystem.client.dto.ClientRegistrationRequest;
 import com.redox.fintechBookingSystem.client.repo.ClientRepo;
 import com.redox.fintechBookingSystem.identity.IdentityRegistrationService;
-import com.redox.fintechBookingSystem.identity.User;
+import com.redox.fintechBookingSystem.identity.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;

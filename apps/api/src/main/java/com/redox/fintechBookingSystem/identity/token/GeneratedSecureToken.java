@@ -3,13 +3,13 @@ package com.redox.fintechBookingSystem.identity.verification;
 import java.util.Arrays;
 import java.util.Objects;
 
-public record GeneratedEmailVerificationToken(
+public record GeneratedSecureToken(
         String rawToken,
         byte[] tokenHash
 ) {
   private final static int SHA256_HASH_LENGTH=32; //SHA-256 produces a 32-byte hash
 
-  public GeneratedEmailVerificationToken{
+  public GeneratedSecureToken {
     if(rawToken==null || rawToken.isBlank()){
       throw new IllegalArgumentException("Raw token must not be null or blank");
     }

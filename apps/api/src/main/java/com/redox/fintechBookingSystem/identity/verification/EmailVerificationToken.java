@@ -1,6 +1,6 @@
 package com.redox.fintechBookingSystem.identity.verification;
 
-import com.redox.fintechBookingSystem.identity.User;
+import com.redox.fintechBookingSystem.identity.user.User;
 import com.redox.fintechBookingSystem.shared.audit.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -34,6 +34,12 @@ public class EmailVerificationToken extends BaseEntity {
   private Instant revokedAt;
 
   public EmailVerificationToken(User user, byte[] tokenHash, Instant expiresAt) {
+    Objects.requireNonNull(user);
+    Objects.requireNonNull(tokenHash);
+    Objects.requireNonNull(expiresAt);
+    if(tokenHash.length!=32){
+      throw new IllegalArgumentException("The token hash needs to be exactly 32 bytes");
+    }
     this.user = user;
     this.tokenHash = tokenHash.clone(); // Defensive copy to prevent external modification
     this.expiresAt = expiresAt;

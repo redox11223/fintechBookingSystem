@@ -59,6 +59,8 @@ citafin:
       refresh-token-ttl: P30D
       refresh-cookie-name: citafin_refresh
       secure-cookie: ${SECURE_COOKIES:false}
+      issuer: ${JWT_ISSUER:citafin-api}
+      audience: ${JWT_AUDIENCE:citafin-web}
     mfa:
       code-length: 6
       time-step-seconds: 30

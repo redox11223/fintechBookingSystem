@@ -1,4 +1,4 @@
-package com.redox.fintechBookingSystem.identity.verification;
+package com.redox.fintechBookingSystem.identity.token;
 
 import org.springframework.stereotype.Component;
 

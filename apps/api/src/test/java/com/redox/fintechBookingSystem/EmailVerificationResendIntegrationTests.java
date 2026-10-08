@@ -2,7 +2,7 @@ package com.redox.fintechBookingSystem;
 
 import com.redox.fintechBookingSystem.identity.config.IdentityProperties;
 import com.redox.fintechBookingSystem.identity.verification.EmailResendService;
-import com.redox.fintechBookingSystem.identity.verification.EmailVerificationTokenGenerator;
+import com.redox.fintechBookingSystem.identity.token.SecureTokenGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,7 +37,7 @@ import static org.mockito.Mockito.verify;
 class EmailVerificationResendIntegrationTests {
 
   @Autowired private EmailResendService resendService;
-  @Autowired private EmailVerificationTokenGenerator tokenGenerator;
+  @Autowired private SecureTokenGenerator tokenGenerator;
   @Autowired private IdentityProperties identityProperties;
   @Autowired private JdbcTemplate jdbc;
   @MockitoBean private JavaMailSender mailSender;

@@ -3,7 +3,7 @@ package com.redox.fintechBookingSystem;
 import com.redox.fintechBookingSystem.client.ClientRegistrationService;
 import com.redox.fintechBookingSystem.client.repo.ClientRepo;
 import com.redox.fintechBookingSystem.client.dto.ClientRegistrationRequest;
-import com.redox.fintechBookingSystem.identity.repo.UserRepo;
+import com.redox.fintechBookingSystem.identity.user.UserRepo;
 import com.redox.fintechBookingSystem.identity.verification.EmailVerificationTokenRepo;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

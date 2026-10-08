@@ -1,7 +1,7 @@
 package com.redox.fintechBookingSystem;
 
 import com.redox.fintechBookingSystem.identity.verification.EmailVerificationConfirmationService;
-import com.redox.fintechBookingSystem.identity.verification.EmailVerificationTokenGenerator;
+import com.redox.fintechBookingSystem.identity.token.SecureTokenGenerator;
 import com.redox.fintechBookingSystem.identity.verification.InvalidEmailVerificationTokenException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +39,7 @@ class EmailVerificationConfirmationIntegrationTests {
   private static final Instant NOW = Instant.parse("2026-09-22T15:30:00Z");
 
   @Autowired private EmailVerificationConfirmationService confirmationService;
-  @Autowired private EmailVerificationTokenGenerator tokenGenerator;
+  @Autowired private SecureTokenGenerator tokenGenerator;
   @Autowired private JdbcTemplate jdbc;
 
   @Test

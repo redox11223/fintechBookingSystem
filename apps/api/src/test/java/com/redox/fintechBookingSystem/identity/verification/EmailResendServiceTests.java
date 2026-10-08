@@ -1,8 +1,10 @@
 package com.redox.fintechBookingSystem.identity.verification;
 
-import com.redox.fintechBookingSystem.identity.User;
+import com.redox.fintechBookingSystem.identity.token.GeneratedSecureToken;
+import com.redox.fintechBookingSystem.identity.token.SecureTokenGenerator;
+import com.redox.fintechBookingSystem.identity.user.User;
 import com.redox.fintechBookingSystem.identity.config.IdentityProperties;
-import com.redox.fintechBookingSystem.identity.repo.UserRepo;
+import com.redox.fintechBookingSystem.identity.user.UserRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,7 +42,7 @@ class EmailResendServiceTests {
   @Mock private EmailVerificationTokenRepo tokenRepo;
   @Mock private IdentityProperties identityProperties;
   @Mock private IdentityProperties.Tokens tokenProperties;
-  @Mock private EmailVerificationTokenGenerator tokenGenerator;
+  @Mock private SecureTokenGenerator tokenGenerator;
   @Mock private ApplicationEventPublisher eventPublisher;
 
   private EmailResendService service;
@@ -98,8 +100,8 @@ class EmailResendServiceTests {
   void replacesOpenTokenWhenCooldownHasElapsed() {
     User user = userWithId("client@example.com");
     EmailVerificationToken openToken = tokenCreatedAt(user, NOW.minus(COOLDOWN));
-    GeneratedEmailVerificationToken generated =
-        new GeneratedEmailVerificationToken("new-raw-token", TOKEN_HASH);
+    GeneratedSecureToken generated =
+        new GeneratedSecureToken("new-raw-token", TOKEN_HASH);
     when(userRepo.findByEmail("client@example.com")).thenReturn(Optional.of(user));
     when(tokenRepo.findOpenTokenByUserId(USER_ID)).thenReturn(Optional.of(openToken));
     when(identityProperties.tokens()).thenReturn(tokenProperties);
@@ -137,7 +139,7 @@ class EmailResendServiceTests {
     when(identityProperties.tokens()).thenReturn(tokenProperties);
     when(tokenProperties.emailVerificationTtl()).thenReturn(TOKEN_TTL);
     when(tokenGenerator.generate()).thenReturn(
-        new GeneratedEmailVerificationToken("new-raw-token", TOKEN_HASH));
+        new GeneratedSecureToken("new-raw-token", TOKEN_HASH));
 
     service.resend("client@example.com");
 

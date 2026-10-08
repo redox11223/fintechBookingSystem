@@ -1,7 +1,8 @@
 package com.redox.fintechBookingSystem.identity.verification;
 
-import com.redox.fintechBookingSystem.identity.User;
-import com.redox.fintechBookingSystem.identity.repo.UserRepo;
+import com.redox.fintechBookingSystem.identity.token.SecureTokenGenerator;
+import com.redox.fintechBookingSystem.identity.user.User;
+import com.redox.fintechBookingSystem.identity.user.UserRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,7 +28,7 @@ class EmailVerificationConfirmationServiceTests {
   private static final byte[] TOKEN_HASH = new byte[32];
   private static final UUID USER_ID = UUID.fromString("ee749af0-262c-4be4-bfde-f2caf163c6ac");
 
-  @Mock private EmailVerificationTokenGenerator tokenGenerator;
+  @Mock private SecureTokenGenerator tokenGenerator;
   @Mock private EmailVerificationTokenConsumptionRepo tokenConsumptionRepo;
   @Mock private UserRepo userRepo;
 

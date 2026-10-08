@@ -1,4 +1,4 @@
-package com.redox.fintechBookingSystem.identity.verification;
+package com.redox.fintechBookingSystem.identity.token;
 
 import org.junit.jupiter.api.Test;
 
@@ -9,15 +9,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
-class EmailVerificationTokenGeneratorTests {
+class SecureTokenGeneratorTests {
   private static final int SHA_256_HASH_LENGTH_BYTES = 32;
 
-  private final EmailVerificationTokenGenerator tokenGenerator =
-      new EmailVerificationTokenGenerator();
+  private final SecureTokenGenerator tokenGenerator =
+      new SecureTokenGenerator();
 
   @Test
   void generatesUrlSafeTokenWithTwoHundredFiftySixBitsOfEntropy() {
-    GeneratedEmailVerificationToken generatedToken = tokenGenerator.generate();
+    GeneratedSecureToken generatedToken = tokenGenerator.generate();
 
     assertThat(generatedToken.rawToken())
         .hasSize(43)
@@ -28,7 +28,7 @@ class EmailVerificationTokenGeneratorTests {
 
   @Test
   void returnsHashOfGeneratedRawToken() {
-    GeneratedEmailVerificationToken generatedToken = tokenGenerator.generate();
+    GeneratedSecureToken generatedToken = tokenGenerator.generate();
 
     assertThat(generatedToken.tokenHash())
         .hasSize(SHA_256_HASH_LENGTH_BYTES)
@@ -37,8 +37,8 @@ class EmailVerificationTokenGeneratorTests {
 
   @Test
   void generatesDifferentTokensOnSuccessiveCalls() {
-    GeneratedEmailVerificationToken firstToken = tokenGenerator.generate();
-    GeneratedEmailVerificationToken secondToken = tokenGenerator.generate();
+    GeneratedSecureToken firstToken = tokenGenerator.generate();
+    GeneratedSecureToken secondToken = tokenGenerator.generate();
 
     assertThat(firstToken.rawToken()).isNotEqualTo(secondToken.rawToken());
     assertThat(firstToken.tokenHash()).isNotEqualTo(secondToken.tokenHash());
@@ -66,21 +66,21 @@ class EmailVerificationTokenGeneratorTests {
     byte[] validHash = new byte[SHA_256_HASH_LENGTH_BYTES];
 
     assertThatIllegalArgumentException()
-        .isThrownBy(() -> new GeneratedEmailVerificationToken(null, validHash));
+        .isThrownBy(() -> new GeneratedSecureToken(null, validHash));
     assertThatIllegalArgumentException()
-        .isThrownBy(() -> new GeneratedEmailVerificationToken(" \t", validHash));
+        .isThrownBy(() -> new GeneratedSecureToken(" \t", validHash));
     assertThatNullPointerException()
-        .isThrownBy(() -> new GeneratedEmailVerificationToken("valid-token", null));
+        .isThrownBy(() -> new GeneratedSecureToken("valid-token", null));
     assertThatIllegalArgumentException()
-        .isThrownBy(() -> new GeneratedEmailVerificationToken("valid-token", new byte[31]));
+        .isThrownBy(() -> new GeneratedSecureToken("valid-token", new byte[31]));
   }
 
   @Test
   void protectsHashWithDefensiveCopies() {
     byte[] originalHash = new byte[SHA_256_HASH_LENGTH_BYTES];
     originalHash[0] = 42;
-    GeneratedEmailVerificationToken generatedToken =
-        new GeneratedEmailVerificationToken("valid-token", originalHash);
+    GeneratedSecureToken generatedToken =
+        new GeneratedSecureToken("valid-token", originalHash);
 
     originalHash[0] = 1;
     assertThat(generatedToken.tokenHash()[0]).isEqualTo((byte) 42);
@@ -95,7 +95,19 @@ class EmailVerificationTokenGeneratorTests {
     String rawToken = "do-not-expose-this-token";
 
     assertThatIllegalArgumentException()
-        .isThrownBy(() -> new GeneratedEmailVerificationToken(rawToken, new byte[31]))
+        .isThrownBy(() -> new GeneratedSecureToken(rawToken, new byte[31]))
         .withMessageNotContaining(rawToken);
   }
+
+  @Test
+  void doesNotExposeRawTokenInStringRepresentation() {
+    String rawToken = "do-not-expose-this-token";
+    GeneratedSecureToken token =
+            new GeneratedSecureToken(rawToken, new byte[32]);
+
+    assertThat(token.toString())
+            .doesNotContain(rawToken)
+            .contains("[REDACTED]");
+  }
+
 }

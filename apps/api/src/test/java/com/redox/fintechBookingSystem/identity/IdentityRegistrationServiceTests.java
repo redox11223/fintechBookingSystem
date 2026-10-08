@@ -4,12 +4,14 @@ import com.redox.fintechBookingSystem.identity.config.IdentityProperties;
 import com.redox.fintechBookingSystem.identity.password.InvalidPasswordException;
 import com.redox.fintechBookingSystem.identity.password.PasswordPolicy;
 import com.redox.fintechBookingSystem.identity.password.PasswordViolation;
-import com.redox.fintechBookingSystem.identity.repo.UserRepo;
+import com.redox.fintechBookingSystem.identity.user.Roles;
+import com.redox.fintechBookingSystem.identity.user.User;
+import com.redox.fintechBookingSystem.identity.user.UserRepo;
 import com.redox.fintechBookingSystem.identity.verification.EmailVerificationToken;
-import com.redox.fintechBookingSystem.identity.verification.EmailVerificationTokenGenerator;
+import com.redox.fintechBookingSystem.identity.token.SecureTokenGenerator;
 import com.redox.fintechBookingSystem.identity.verification.EmailVerificationTokenRepo;
 import com.redox.fintechBookingSystem.identity.verification.EmailVerificationRequested;
-import com.redox.fintechBookingSystem.identity.verification.GeneratedEmailVerificationToken;
+import com.redox.fintechBookingSystem.identity.token.GeneratedSecureToken;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,7 +50,7 @@ class IdentityRegistrationServiceTests {
 
   @Mock private UserRepo userRepo;
   @Mock private PasswordPolicy passwordPolicy;
-  @Mock private EmailVerificationTokenGenerator tokenGenerator;
+  @Mock private SecureTokenGenerator tokenGenerator;
   @Mock private PasswordEncoder passwordEncoder;
   @Mock private IdentityProperties identityProperties;
   @Mock private IdentityProperties.Tokens tokenProperties;
@@ -73,8 +75,8 @@ class IdentityRegistrationServiceTests {
   @Test
   void registersPendingClientIdentityWithHashedSecretsAndConfiguredExpiration() {
     User savedUser = new User();
-    GeneratedEmailVerificationToken generatedToken =
-        new GeneratedEmailVerificationToken("raw-verification-token", TOKEN_HASH);
+    GeneratedSecureToken generatedToken =
+        new GeneratedSecureToken("raw-verification-token", TOKEN_HASH);
     when(passwordPolicy.validateAndNormalize(RAW_PASSWORD)).thenReturn(NORMALIZED_PASSWORD);
     when(passwordEncoder.encode(NORMALIZED_PASSWORD)).thenReturn(PASSWORD_HASH);
     when(userRepo.existsByEmail("client@example.com")).thenReturn(false);

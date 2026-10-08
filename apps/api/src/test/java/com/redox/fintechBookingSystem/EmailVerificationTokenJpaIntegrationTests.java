@@ -1,8 +1,8 @@
 package com.redox.fintechBookingSystem;
 
-import com.redox.fintechBookingSystem.identity.Roles;
-import com.redox.fintechBookingSystem.identity.User;
-import com.redox.fintechBookingSystem.identity.repo.UserRepo;
+import com.redox.fintechBookingSystem.identity.user.Roles;
+import com.redox.fintechBookingSystem.identity.user.User;
+import com.redox.fintechBookingSystem.identity.user.UserRepo;
 import com.redox.fintechBookingSystem.identity.verification.EmailVerificationToken;
 import com.redox.fintechBookingSystem.identity.verification.EmailVerificationTokenRepo;
 import jakarta.persistence.EntityManager;

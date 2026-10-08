@@ -1,4 +1,4 @@
-package com.redox.fintechBookingSystem.identity.verification;
+package com.redox.fintechBookingSystem.identity.token;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -23,4 +23,9 @@ public record GeneratedSecureToken(
   public byte[] tokenHash() {
     return Arrays.copyOf(tokenHash, tokenHash.length);
   }
+  @Override
+  public String toString() {
+    return "GeneratedSecureToken[rawToken=[REDACTED], tokenHash=[REDACTED]]";
+  }
+
 }

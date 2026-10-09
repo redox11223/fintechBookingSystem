@@ -23,8 +23,10 @@ import java.util.Optional;
 
 @Component
 public class LoginTransaction {
+  private static final String DUMMY_RAW_PASSWORD = "this-is-a-dummy-password-only-for-timing";
+
   private final PasswordEncoder passwordEncoder;
-  private final String dummyPassword;
+  private final String dummyPasswordHash;
   private final UserRepo userRepo;
   private final PasswordPolicy passwordPolicy;
   private final IdentityProperties identityProperties;
@@ -41,7 +43,7 @@ public class LoginTransaction {
     this.authSessionRepo = authSessionRepo;
     this.tokenRepo = tokenRepo;
     this.passwordEncoder=passwordEncoder;
-    this.dummyPassword= passwordEncoder.encode("this-is-a-dummy-password-only-for-timing");
+    this.dummyPasswordHash=passwordEncoder.encode(DUMMY_RAW_PASSWORD);
     this.clock = clock;
   }
 
@@ -52,12 +54,12 @@ public class LoginTransaction {
     try{
        normalizedPassword=passwordPolicy.validateAndNormalize(password);
     }catch (InvalidPasswordException e){
-      passwordEncoder.matches(dummyPassword,dummyPassword);
+      passwordEncoder.matches(DUMMY_RAW_PASSWORD,dummyPasswordHash);
       return LoginOutcome.Failure.INVALID_CREDENTIALS;
     }
     Optional<User> userContainer=userRepo.findByEmail(normalizedEmail);
     if(userContainer.isEmpty()){
-      passwordEncoder.matches(normalizedPassword,dummyPassword);
+      passwordEncoder.matches(normalizedPassword,dummyPasswordHash);
       return LoginOutcome.Failure.INVALID_CREDENTIALS;
     }
     User user=userContainer.get();

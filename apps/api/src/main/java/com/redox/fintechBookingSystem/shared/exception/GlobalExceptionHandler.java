@@ -26,9 +26,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                               HttpServletRequest request) {
     ProblemDetail response = ProblemDetailsGenerator.generate(HttpStatus.NOT_FOUND,
             ex.getMessage(),
-            URI.create("https://api.citafin.dev/problems/resource-not-found"),
+            "resource-not-found",
             "Resource not found",
-            URI.create(request.getRequestURI()),
+            request,
             "RESOURCE_NOT_FOUND");
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
   }
@@ -38,9 +38,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                                HttpServletRequest request) {
     ProblemDetail response = ProblemDetailsGenerator.generate(HttpStatus.CONFLICT,
             ex.getMessage(),
-            URI.create("https://api.citafin.dev/problems/duplicate-resource"),
+            "duplicate-resource",
             "Duplicate resource",
-            URI.create(request.getRequestURI()),
+            request,
             "DUPLICATE_RESOURCE");
     return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
   }

@@ -1,5 +1,6 @@
 package com.redox.fintechBookingSystem.shared.utils;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 
@@ -13,22 +14,22 @@ public final class ProblemDetailsGenerator {
    *
    * @param status   The HTTP status.
    * @param detail   The detail message.
-   * @param type     The type of the problem.
+   * @param slug     The specific slug of the problem.
    * @param title    The title of the problem.
-   * @param instance The instance of the problem.
+   * @param request The request of the problem.
    * @param code     The code of the problem.
    * @return A ProblemDetail instance.
    */
   public static ProblemDetail generate(HttpStatus status,
                                                     String detail,
-                                                    URI type,
+                                                    String slug,
                                                     String title,
-                                                    URI instance,
+                                                    HttpServletRequest request,
                                                     String code) {
     ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(status, detail);
-    problemDetail.setType(type);
+    problemDetail.setType(URI.create("https://api.citafin.dev/problems/"+slug));
     problemDetail.setTitle(title);
-    problemDetail.setInstance(instance);
+    problemDetail.setInstance(URI.create(request.getRequestURI()));
     problemDetail.setProperty("code", code);
     return problemDetail;
   }

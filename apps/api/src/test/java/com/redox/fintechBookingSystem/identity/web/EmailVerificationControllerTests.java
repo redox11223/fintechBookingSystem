@@ -8,8 +8,10 @@ import com.redox.fintechBookingSystem.shared.exception.GlobalExceptionHandler;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -22,13 +24,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(EmailVerificationController.class)
-@Import({SecurityConfig.class, GlobalExceptionHandler.class, IdentityExceptionHandler.class})
+@Import({
+    SecurityConfig.class,
+    GlobalExceptionHandler.class,
+    IdentityExceptionHandler.class
+})
+@EnableConfigurationProperties({
+    com.redox.fintechBookingSystem.identity.config.IdentityProperties.class,
+    com.redox.fintechBookingSystem.shared.config.SecurityProperties.class
+})
 class EmailVerificationControllerTests {
   private static final String RAW_TOKEN = "raw-verification-token";
 
   @Autowired private MockMvc mockMvc;
   @MockitoBean private EmailVerificationConfirmationService confirmationService;
   @MockitoBean private EmailResendService resendService;
+  @MockitoBean private JwtDecoder jwtDecoder;
 
   @Test
   void confirmsValidTokenWithoutCsrfAndReturnsNoContent() throws Exception {

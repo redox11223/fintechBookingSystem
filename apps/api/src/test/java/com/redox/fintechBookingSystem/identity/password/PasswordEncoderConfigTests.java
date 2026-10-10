@@ -6,8 +6,6 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PasswordEncoderConfigTests {
@@ -47,6 +45,6 @@ class PasswordEncoderConfigTests {
 
   private static IdentityProperties identityProperties() {
     var password = new IdentityProperties.Password(15, 64, 72, TEST_BCRYPT_STRENGTH);
-    return new IdentityProperties(password, null, null, null, null, null, List.of());
+    return new IdentityProperties(password, null, null, null, null, null);
   }
 }

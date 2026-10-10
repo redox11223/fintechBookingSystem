@@ -2,6 +2,7 @@ package com.redox.fintechBookingSystem.shared.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -9,6 +10,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 import static org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher.pathPattern;
 
@@ -19,6 +24,7 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
     return http
+            .cors(Customizer.withDefaults())
             .csrf(csrf -> csrf.ignoringRequestMatchers(
                     pathPattern(HttpMethod.POST, "/api/v1/auth/register"),
                     pathPattern(HttpMethod.POST, "/api/v1/auth/login"),
@@ -33,6 +39,21 @@ public class SecurityConfig {
                     resourceServer.jwt(jwt->
                             jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
             .build();
+  }
+
+  @Bean
+  public UrlBasedCorsConfigurationSource corsConfigurationSource(
+      SecurityProperties properties) {
+    CorsConfiguration configuration = new CorsConfiguration();
+    configuration.setAllowedOrigins(properties.allowedOrigins());
+    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+    configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-XSRF-TOKEN"));
+    configuration.setAllowCredentials(true);
+    configuration.setMaxAge(3600L);
+
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/api/**", configuration);
+    return source;
   }
 
   private JwtAuthenticationConverter jwtAuthenticationConverter() {

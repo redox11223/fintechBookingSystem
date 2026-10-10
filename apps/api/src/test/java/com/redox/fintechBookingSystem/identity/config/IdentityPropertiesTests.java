@@ -29,13 +29,14 @@ class IdentityPropertiesTests {
           "citafin.identity.session.refresh-token-ttl=P30D",
           "citafin.identity.session.refresh-cookie-name=citafin_refresh",
           "citafin.identity.session.secure-cookie=false",
+          "citafin.identity.session.issuer=citafin-api",
+          "citafin.identity.session.audience=citafin-api",
           "citafin.identity.mfa.code-length=6",
           "citafin.identity.mfa.time-step-seconds=30",
           "citafin.identity.mfa.allowed-time-step-drift=1",
           "citafin.identity.mfa.recovery-code-count=10",
           "citafin.identity.mail.from=no-reply@citafin.local",
           "citafin.identity.mail.frontend-base-url=http://localhost:5173",
-          "citafin.identity.allowed-origins[0]=http://localhost:5173",
           "citafin.identity.secrets.jwt-hmac-key=",
           "citafin.identity.secrets.mfa-encryption-key="
       );
@@ -53,7 +54,6 @@ class IdentityPropertiesTests {
       assertThat(policy.password().bcryptStrength()).isEqualTo(12);
       assertThat(policy.tokens().emailVerificationTtl()).isEqualTo(Duration.ofHours(24));
       assertThat(policy.session().refreshTokenTtl()).isEqualTo(Duration.ofDays(30));
-      assertThat(policy.allowedOrigins()).containsExactly("http://localhost:5173");
       assertThat(secrets.jwtHmacKey()).isEmpty();
       assertThat(secrets.mfaEncryptionKey()).isEmpty();
     });

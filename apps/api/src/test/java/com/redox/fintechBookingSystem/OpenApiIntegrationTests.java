@@ -67,6 +67,17 @@ class OpenApiIntegrationTests {
             "$.paths['/api/v1/auth/email-verifications/resend'].post.responses['400']")
             .exists())
         .andExpect(jsonPath("$.components.schemas.EmailVerificationAcceptedResponse").exists())
+        .andExpect(jsonPath("$.paths['/api/v1/auth/login'].post.responses['200']").exists())
+        .andExpect(jsonPath("$.paths['/api/v1/auth/login'].post.responses['400']").exists())
+        .andExpect(jsonPath("$.paths['/api/v1/auth/login'].post.responses['401']").exists())
+        .andExpect(jsonPath("$.paths['/api/v1/auth/login'].post.responses['403']").exists())
+        .andExpect(jsonPath(
+            "$.paths['/api/v1/auth/login'].post.responses['200'].headers['Set-Cookie']")
+            .exists())
+        .andExpect(jsonPath("$.components.schemas.LoginRequest.properties.password.format")
+            .value("password"))
+        .andExpect(jsonPath("$.components.schemas.LoginRequest.properties.password.writeOnly")
+            .value(true))
         .andExpect(jsonPath("$.paths['/api/v1/categories/{id}']").exists())
         .andExpect(jsonPath("$.paths['/api/v1/services/{id}']").exists());
   }

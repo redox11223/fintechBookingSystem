@@ -58,8 +58,8 @@ cuentas sintéticas reiniciables y la topología acordada en ADR-005; Datadog se
 
 ## Próximo punto de control
 
-Diseñar el bloque 3 antes de programarlo: contrato de `POST /api/v1/auth/login`, respuestas
-uniformes para credenciales inválidas y cuentas bloqueadas, estado persistente necesario para la
-ventana de cinco fallos en 15 minutos y límite transaccional bajo concurrencia. Definir también el
-contenido mínimo del access JWT de 10 minutos y la relación con la sesión refresh rotativa, sin
-implementar todavía cookies ni rotación hasta cerrar estas decisiones.
+Continuar el bloque 3 diseñando la rotación del refresh token, la detección de reutilización y
+logout. Login, bloqueo concurrente, emisión/validación del access JWT, cookie inicial, CORS y sus
+pruebas ya están implementados. Antes de programar refresh/logout se debe cerrar el contrato HTTP,
+la actualización atómica de tokens, la revocación de la familia o sesión ante reutilización y la
+protección CSRF/Origin de los endpoints que consumen la cookie.

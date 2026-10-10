@@ -32,9 +32,9 @@ explícita para la tarea concreta.
 | 2 | Diseñar requests, respuestas y errores de registro/verificación | JUNTOS | TERMINADO |
 | 2 | Implementar registro, normalización y ciclo del token de verificación | TÚ, con guía y revisión | TERMINADO |
 | 2 | Preparar adaptador SMTP, pruebas y documentación OpenAPI | TÚ código; YO pruebas y documentación | TERMINADO |
-| 3 | Implementar login, bloqueo y emisión del access token | TÚ, con guía y revisión | PENDIENTE |
+| 3 | Implementar login, bloqueo y emisión del access token | TÚ, con guía y revisión | TERMINADO |
 | 3 | Implementar rotación, detección de reutilización y logout | TÚ, con guía y revisión | PENDIENTE |
-| 3 | Preparar cookies, CSRF, CORS y pruebas concurrentes | YO | PENDIENTE |
+| 3 | Preparar cookies, CSRF, CORS y pruebas concurrentes | YO | EN CURSO |
 | 4 | Implementar solicitud y consumo de recuperación | TÚ, con guía y revisión | PENDIENTE |
 | 4 | Preparar correo, pruebas de expiración y revocación de sesiones | YO | PENDIENTE |
 | 5 | Diseñar e implementar invitaciones y bootstrap inicial | JUNTOS; lógica principal TÚ | PENDIENTE |
@@ -265,11 +265,51 @@ del evento. Las pruebas web comprueban `202`, validación y CSRF. Una prueba con
 demuestra que dos reenvíos concurrentes terminan normalmente, pero solo crean un token nuevo y
 envían un correo.
 
+## Login, bloqueo y access token implementados
+
+`POST /api/v1/auth/login` recibe correo y contraseña. Un login correcto devuelve únicamente el
+access token breve en el cuerpo (`tokenType=Bearer`, `expiresIn=600`) y entrega el refresh token
+opaco mediante `Set-Cookie`; el refresh token nunca forma parte del JSON ni se persiste en texto
+plano. OpenAPI documenta `200`, validación `400`, autenticación fallida `401`, estados de cuenta
+`403` y la cabecera de cookie.
+
+Correo inexistente, contraseña incorrecta, contraseña fuera de la política y cuenta bloqueada
+producen el mismo `401 AUTHENTICATION_FAILED`. La contraseña fuera de la política y el correo
+inexistente ejecutan una comprobación BCrypt ficticia para reducir diferencias temporales. Una
+contraseña correcta permite distinguir los estados `ACCOUNT_DISABLED`, `EMAIL_NOT_VERIFIED` y
+`MFA_REQUIRED` mediante `403`, sin crear sesión.
+
+La actualización del contador ocurre en `LoginTransaction`, que devuelve un `LoginOutcome` en vez
+de lanzar la excepción pública. Así la transacción confirma el fallo antes de que `LoginService`
+lo traduzca a Problem Details. `UserRepo.findByEmail` toma `PESSIMISTIC_WRITE`: intentos
+simultáneos para la misma cuenta se serializan y no pierden incrementos, mientras cuentas distintas
+siguen progresando de forma independiente. Una prueba con PostgreSQL real inicia dos contraseñas
+incorrectas en paralelo y comprueba que `failed_login_count` termina en dos.
+
+El access JWT usa HS256, dura diez minutos e incluye `iss`, `aud`, `sub`, `iat`, `exp`, `jti`, el
+identificador de sesión `sid` y roles ordenados. El decoder exige la firma HS256, emisor,
+audiencia y tiempos válidos; Spring Security convierte el claim `roles` en autoridades `ROLE_*`.
+La clave de pruebas es determinista y exclusiva del perfil de test; producción continúa exigiendo
+el secreto mediante configuración externa.
+
+La cookie refresh es `HttpOnly`, `SameSite=Strict`, host-only, usa la ruta `/api/v1/auth`, comparte
+la expiración absoluta de 30 días y activa `Secure` según el entorno. CORS permite credenciales
+solo para la lista exacta `citafin.security.allowed-origins`; no usa comodines. Login permanece
+como excepción CSRF porque todavía no consume una credencial que el navegador adjunte
+automáticamente. Refresh y logout sí requerirán protección CSRF y validación de `Origin` cuando se
+implementen.
+
+Las pruebas cubren reglas de ventana y bloqueo, mapeo de resultados a errores públicos,
+orquestación transaccional, claims JWT, atributos de cookie, respuestas web, ausencia del refresh
+token en el cuerpo, preflight CORS permitido/rechazado y concurrencia sobre PostgreSQL. El paquete
+`identity.user` se publica como interfaz modular explícita `identity::user`, sin abrir el resto de
+la implementación de identidad a `client` y `advisor`.
+
 ## Continuidad
 
 Al retomar: leer `AGENTS.md`, `docs/roadmap.md`, este archivo y ADR-002; revisar `git status` y
-continuar en el bloque 3. Registro, confirmación y reenvío ya cuentan con pruebas unitarias, web y
-de concurrencia sobre PostgreSQL. El siguiente trabajo conjunto es diseñar el contrato y el modelo
-de bloqueo del login antes de implementar credenciales, emisión del access JWT y sesiones refresh.
-La blocklist de contraseñas se omite conscientemente en V1. No es necesario releer todos los
-documentos.
+continuar en el bloque 3. Registro, verificación y login ya cuentan con pruebas unitarias, web y de
+concurrencia sobre PostgreSQL. La siguiente tarea **TÚ** es implementar la rotación del refresh
+token, la detección de reutilización y logout conforme al contrato que diseñaremos **JUNTOS**.
+Después, **YO** cerraré CSRF/Origin, cookies de renovación y borrado, pruebas concurrentes y
+OpenAPI de esos endpoints. La blocklist de contraseñas se omite conscientemente en V1.

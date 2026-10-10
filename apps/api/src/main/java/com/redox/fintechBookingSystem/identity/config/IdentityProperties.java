@@ -10,7 +10,6 @@ import org.springframework.validation.annotation.Validated;
 
 import java.net.URI;
 import java.time.Duration;
-import java.util.List;
 
 /**
  * Non-secret identity policy. Values live in configuration so tests and deployments can override
@@ -24,8 +23,7 @@ public record IdentityProperties(
     @Valid @NotNull Login login,
     @Valid @NotNull Session session,
     @Valid @NotNull Mfa mfa,
-    @Valid @NotNull Mail mail,
-    @NotNull List<@NotBlank String> allowedOrigins
+    @Valid @NotNull Mail mail
 ) {
   public record Password(
       @Min(15) int minCharacters,

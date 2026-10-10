@@ -4,3 +4,9 @@ spring:
       enabled: false
   jpa:
     show-sql: false
+
+citafin:
+  identity:
+    secrets:
+      # Deterministic test-only 256-bit key. Production must inject its own secret.
+      jwt-hmac-key: MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDE=

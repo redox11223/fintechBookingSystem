@@ -4,8 +4,6 @@ import com.redox.fintechBookingSystem.identity.config.IdentityProperties;
 import org.junit.jupiter.api.Test;
 
 import java.text.Normalizer;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -92,6 +90,6 @@ class PasswordPolicyTests {
 
   private IdentityProperties identityProperties() {
     var password = new IdentityProperties.Password(15, 64, 72, 12);
-    return new IdentityProperties(password, null, null, null, null, null, List.of());
+    return new IdentityProperties(password, null, null, null, null, null);
   }
 }

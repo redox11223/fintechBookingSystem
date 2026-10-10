@@ -8,8 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -22,10 +24,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ClientRegistrationController.class)
-@Import({SecurityConfig.class, GlobalExceptionHandler.class})
+@Import({
+    SecurityConfig.class,
+    GlobalExceptionHandler.class
+})
+@EnableConfigurationProperties({
+    com.redox.fintechBookingSystem.identity.config.IdentityProperties.class,
+    com.redox.fintechBookingSystem.shared.config.SecurityProperties.class
+})
 class ClientRegistrationControllerTests {
   @Autowired private MockMvc mockMvc;
   @MockitoBean private ClientRegistrationService registrationService;
+  @MockitoBean private JwtDecoder jwtDecoder;
 
   @Test
   void acceptsValidRegistrationWithoutCsrfToken() throws Exception {

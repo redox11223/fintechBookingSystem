@@ -32,7 +32,7 @@ class IdentityExceptionHandler{
                                                                     HttpServletRequest request){
     ProblemDetail response=ProblemDetailsGenerator.generate(HttpStatus.UNAUTHORIZED,
             ex.getMessage(),
-            "Authentication-failed",
+            "authentication-failed",
             "Authentication failed",
             request,
             "AUTHENTICATION_FAILED"
@@ -44,7 +44,7 @@ class IdentityExceptionHandler{
                                                                     HttpServletRequest request){
     ProblemDetail response=ProblemDetailsGenerator.generate(HttpStatus.FORBIDDEN,
             ex.getMessage(),
-            "Account-disabled",
+            "account-disabled",
             "Account disabled",
             request,
             "ACCOUNT_DISABLED"
@@ -56,7 +56,7 @@ class IdentityExceptionHandler{
                                                                     HttpServletRequest request){
     ProblemDetail response=ProblemDetailsGenerator.generate(HttpStatus.FORBIDDEN,
             ex.getMessage(),
-            "Email-not-verified",
+            "email-not-verified",
             "Email not verified",
             request,
             "EMAIL_NOT_VERIFIED"
@@ -68,8 +68,8 @@ class IdentityExceptionHandler{
                                                                 HttpServletRequest request){
     ProblemDetail response=ProblemDetailsGenerator.generate(HttpStatus.FORBIDDEN,
             ex.getMessage(),
-            "Mfa-required",
-            "Mfa required",
+            "mfa-required",
+            "MFA required",
             request,
             "MFA_REQUIRED"
     );

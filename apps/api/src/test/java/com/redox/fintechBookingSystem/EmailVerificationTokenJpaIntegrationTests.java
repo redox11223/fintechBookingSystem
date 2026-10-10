@@ -44,11 +44,10 @@ class EmailVerificationTokenJpaIntegrationTests {
 
   @Test
   void persistsTokenMappingWithoutEagerlyLoadingUser() {
-    User user = new User();
-    user.setEmail("jpa-token-%s@example.com".formatted(UUID.randomUUID()));
-    user.setPassword("test-password-hash");
-    user.setActive(true);
-    user.getRoles().add(Roles.CLIENT);
+    User user = new User(
+        "jpa-token-%s@example.com".formatted(UUID.randomUUID()),
+        "test-password-hash");
+    user.addRole(Roles.CLIENT);
     userRepo.saveAndFlush(user);
 
     byte[] tokenHash = new byte[32];

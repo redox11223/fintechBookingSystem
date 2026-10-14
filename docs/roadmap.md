@@ -58,8 +58,9 @@ cuentas sintéticas reiniciables y la topología acordada en ADR-005; Datadog se
 
 ## Próximo punto de control
 
-Continuar el bloque 3 diseñando la rotación del refresh token, la detección de reutilización y
-logout. Login, bloqueo concurrente, emisión/validación del access JWT, cookie inicial, CORS y sus
-pruebas ya están implementados. Antes de programar refresh/logout se debe cerrar el contrato HTTP,
-la actualización atómica de tokens, la revocación de la familia o sesión ante reutilización y la
-protección CSRF/Origin de los endpoints que consumen la cookie.
+Continuar el bloque 3 cerrando la infraestructura CSRF/Origin de las operaciones con cookie
+(**YO**) y después logout (**TÚ**, con guía y revisión). Login y refresh rotativo ya están
+implementados; la rotación conserva el límite absoluto de sesión y la reutilización confirma
+su revocación antes de devolver el error. Refresh mantiene CSRF activo, pero falta preparar
+su obtención/envío desde la SPA y la validación explícita de `Origin`; no considerar terminado
+el bloque hasta completar esos controles y logout.

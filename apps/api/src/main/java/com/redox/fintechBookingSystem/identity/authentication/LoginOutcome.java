@@ -3,6 +3,7 @@ package com.redox.fintechBookingSystem.identity.authentication;
 import com.redox.fintechBookingSystem.identity.token.GeneratedSecureToken;
 import com.redox.fintechBookingSystem.identity.user.Roles;
 
+import java.time.Instant;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -18,13 +19,15 @@ public sealed interface LoginOutcome permits LoginOutcome.Success,LoginOutcome.F
           UUID userId,
           UUID sessionId,
           Set<Roles> roles,
-          GeneratedSecureToken refreshToken
+          GeneratedSecureToken refreshToken,
+          Instant absoluteExpiresAt
   ) implements LoginOutcome{
     public Success{
       Objects.requireNonNull(userId, "User ID is required");
       Objects.requireNonNull(sessionId, "Session ID is required");
       Objects.requireNonNull(roles, "Roles are required");
       Objects.requireNonNull(refreshToken, "Refresh token is required");
+      Objects.requireNonNull(absoluteExpiresAt, "Session expiration is required");
       if(roles.isEmpty()){
         throw new IllegalArgumentException("At least one role is required for a successful login");
       }

@@ -49,8 +49,18 @@ public class RefreshToken extends BaseEntity {
   public byte[] getTokenHash(){
     return Arrays.copyOf(tokenHash,tokenHash.length);
   }
+  public boolean isConsumed(){
+    return consumedAt!=null;
+  }
+  public boolean isRevoked(){
+    return revokedAt!=null;
+  }
+  public boolean isValidAt(Instant now){
+    Objects.requireNonNull(now);
+    return isOpen() && now.isBefore(expiresAt);
+  }
   public boolean isOpen(){
-    return consumedAt==null && revokedAt==null;
+    return consumedAt==null && !isRevoked();
   }
   public void revokeAt(Instant now){
     Objects.requireNonNull(now);
@@ -59,6 +69,16 @@ public class RefreshToken extends BaseEntity {
     }
     this.revokedAt=now; //only an open token can be revoked
 
+  }
+  public void consumeAt(Instant consumedAt){
+    Objects.requireNonNull(consumedAt);
+    if(!isOpen()){
+      throw new IllegalStateException("Only an open refresh token can be consumed");
+    }
+    if(!consumedAt.isBefore(expiresAt)){
+      throw new IllegalStateException("An expired refresh token cannot be consumed");
+    }
+    this.consumedAt=consumedAt;
   }
 
 }

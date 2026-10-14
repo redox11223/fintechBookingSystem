@@ -33,6 +33,9 @@ public class AuthSession extends BaseEntity {
     this.user=user;
     this.absoluteExpiresAt=absoluteExpiresAt;
   }
+  public boolean isRevoked(){
+    return revokedAt!=null;
+  }
 
   public boolean isActiveAt(Instant now){
     Objects.requireNonNull(now);
@@ -41,7 +44,7 @@ public class AuthSession extends BaseEntity {
 
   public void revokeAt(Instant now){
     Objects.requireNonNull(now);
-    if(revokedAt!=null){
+    if(isRevoked()){
       throw new IllegalStateException("The session is already revoked");
     }
     this.revokedAt=now;

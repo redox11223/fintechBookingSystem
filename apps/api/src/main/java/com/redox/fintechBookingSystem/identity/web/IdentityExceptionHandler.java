@@ -5,6 +5,7 @@ import com.redox.fintechBookingSystem.identity.authentication.exception.Authenti
 import com.redox.fintechBookingSystem.identity.authentication.exception.EmailNotVerifiedException;
 import com.redox.fintechBookingSystem.identity.authentication.exception.MfaRequiredException;
 import com.redox.fintechBookingSystem.identity.verification.InvalidEmailVerificationTokenException;
+import com.redox.fintechBookingSystem.identity.session.InvalidRefreshSessionException;
 import com.redox.fintechBookingSystem.shared.utils.ProblemDetailsGenerator;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,18 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice(basePackageClasses = EmailVerificationController.class)
 class IdentityExceptionHandler{
+  @ExceptionHandler(InvalidRefreshSessionException.class)
+  ResponseEntity<ProblemDetail> handleInvalidRefreshSession(InvalidRefreshSessionException ex,
+                                                            HttpServletRequest request){
+    ProblemDetail response=ProblemDetailsGenerator.generate(HttpStatus.UNAUTHORIZED,
+            ex.getMessage(),
+            "invalid-refresh-session",
+            "Invalid refresh session",
+            request,
+            "REFRESH_SESSION_INVALID");
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+  }
+
   @ExceptionHandler(InvalidEmailVerificationTokenException.class)
   ResponseEntity<ProblemDetail> handleInvalidEmailVerificationToken(InvalidEmailVerificationTokenException ex,
                                                                            HttpServletRequest request){

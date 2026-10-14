@@ -33,7 +33,7 @@ explícita para la tarea concreta.
 | 2 | Implementar registro, normalización y ciclo del token de verificación | TÚ, con guía y revisión | TERMINADO |
 | 2 | Preparar adaptador SMTP, pruebas y documentación OpenAPI | TÚ código; YO pruebas y documentación | TERMINADO |
 | 3 | Implementar login, bloqueo y emisión del access token | TÚ, con guía y revisión | TERMINADO |
-| 3 | Implementar rotación, detección de reutilización y logout | TÚ, con guía y revisión | PENDIENTE |
+| 3 | Implementar rotación, detección de reutilización y logout | TÚ, con guía y revisión | EN CURSO |
 | 3 | Preparar cookies, CSRF, CORS y pruebas concurrentes | YO | EN CURSO |
 | 4 | Implementar solicitud y consumo de recuperación | TÚ, con guía y revisión | PENDIENTE |
 | 4 | Preparar correo, pruebas de expiración y revocación de sesiones | YO | PENDIENTE |
@@ -305,11 +305,46 @@ token en el cuerpo, preflight CORS permitido/rechazado y concurrencia sobre Post
 `identity.user` se publica como interfaz modular explícita `identity::user`, sin abrir el resto de
 la implementación de identidad a `client` y `advisor`.
 
+## Refresh rotativo implementado; protección web pendiente de cierre
+
+`RefreshTransaction` bloquea la sesión asociada al hash, incluyendo tokens consumidos para
+poder detectar reutilización. Consulta el reloj después de adquirir el bloqueo y rechaza
+sesiones inactivas y tokens vencidos o revocados. La rotación consume el token, fuerza un
+`flush` para liberar el índice parcial de token abierto y crea el reemplazo dentro de la
+misma transacción, conservando la expiración absoluta de sesión.
+
+Reutilizar un token consumido revoca su sesión, sin afectar sesiones independientes. El
+resultado de fallo permite confirmar la revocación antes de que `RefreshService` lance la
+excepción pública. Una revocación de sesión impide nuevos refresh, pero el access JWT ya
+emitido sigue válido hasta su expiración: actualmente el decoder no consulta la sesión.
+Las renovaciones simultáneas con el mismo token disparan esta política estricta; la futura
+SPA deberá coordinar sus solicitudes de renovación.
+
+Login y refresh comparten `AuthenticatedResult`, un resultado interno que transporta el
+access token, su duración, el refresh opaco y la expiración absoluta de sesión. El refresh
+original solo se entrega en cookie; la fecha de sesión permite calcular su duración restante
+sin extender el plazo. Si el plazo vence después del commit, la cookie se emite con duración
+cero. Los detalles de respuestas y errores se mantienen en OpenAPI.
+
+Las pruebas incorporadas cubren rotación, expiración exacta, cookies, errores públicos,
+rollback después del consumo y dos refresh concurrentes con PostgreSQL. También verifican
+que el rechazo por reutilización confirma la revocación y que la sesión independiente sigue
+funcionando. La suite web usa un token CSRF de pruebas para entrar al controlador: esto no
+implementa el mecanismo que usará la SPA.
+
+Verificación de esta revisión: `./mvnw -o test` desde `apps/api` pasó con 134 pruebas,
+sin fallos ni errores, incluyendo las tres nuevas de integración con PostgreSQL.
+
+**Pendiente:** preparar obtención y envío de CSRF para la SPA sin depender de una sesión HTTP,
+validar explícitamente `Origin` en las operaciones con cookie y completar logout. Refresh
+conserva la protección CSRF de Spring Security y no se añade a las excepciones de login y
+registro. CORS ya rechaza orígenes no permitidos cuando el encabezado está presente; no
+sustituye la validación explícita pendiente. Este bloque todavía no se considera terminado.
+
 ## Continuidad
 
-Al retomar: leer `AGENTS.md`, `docs/roadmap.md`, este archivo y ADR-002; revisar `git status` y
-continuar en el bloque 3. Registro, verificación y login ya cuentan con pruebas unitarias, web y de
-concurrencia sobre PostgreSQL. La siguiente tarea **TÚ** es implementar la rotación del refresh
-token, la detección de reutilización y logout conforme al contrato que diseñaremos **JUNTOS**.
-Después, **YO** cerraré CSRF/Origin, cookies de renovación y borrado, pruebas concurrentes y
-OpenAPI de esos endpoints. La blocklist de contraseñas se omite conscientemente en V1.
+Al retomar: leer `AGENTS.md`, `docs/roadmap.md`, este archivo y ADR-002; revisar `git status`.
+Registro, verificación, login y refresh rotativo están implementados. Continuar en el bloque 3:
+**YO** cerraré la infraestructura CSRF/Origin con sus pruebas; **TÚ** implementarás logout con
+guía y revisión. Mantener el alcance de la tarea de rotación/logout como `EN CURSO` hasta cerrar
+ambas operaciones y su protección web. La blocklist de contraseñas se omite conscientemente en V1.

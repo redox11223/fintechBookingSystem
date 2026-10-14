@@ -1,6 +1,6 @@
 package com.redox.fintechBookingSystem.identity.web;
 
-import com.redox.fintechBookingSystem.identity.authentication.AuthenticatedLogin;
+import com.redox.fintechBookingSystem.identity.authentication.AuthenticatedResult;
 import com.redox.fintechBookingSystem.identity.authentication.LoginService;
 import com.redox.fintechBookingSystem.identity.authentication.exception.AccountDisabledException;
 import com.redox.fintechBookingSystem.identity.authentication.exception.AuthenticationFailedException;
@@ -8,6 +8,9 @@ import com.redox.fintechBookingSystem.identity.authentication.exception.EmailNot
 import com.redox.fintechBookingSystem.identity.authentication.exception.MfaRequiredException;
 import com.redox.fintechBookingSystem.identity.authentication.jwt.IssuedAccessToken;
 import com.redox.fintechBookingSystem.identity.token.GeneratedSecureToken;
+import com.redox.fintechBookingSystem.identity.session.RefreshService;
+import com.redox.fintechBookingSystem.identity.session.InvalidRefreshSessionException;
+import jakarta.servlet.http.Cookie;
 import com.redox.fintechBookingSystem.shared.config.SecurityConfig;
 import com.redox.fintechBookingSystem.shared.exception.GlobalExceptionHandler;
 import org.junit.jupiter.api.Test;
@@ -53,6 +56,7 @@ class AuthControllerTests {
 
   @Autowired private MockMvc mockMvc;
   @MockitoBean private LoginService loginService;
+  @MockitoBean private RefreshService refreshService;
   @MockitoBean private RefreshCookieFactory refreshCookieFactory;
   @MockitoBean private JwtDecoder jwtDecoder;
 
@@ -60,10 +64,10 @@ class AuthControllerTests {
   void returnsAccessTokenInBodyAndRefreshTokenOnlyInCookie() throws Exception {
     GeneratedSecureToken refreshToken =
         new GeneratedSecureToken("raw-refresh-token", new byte[32]);
-    AuthenticatedLogin authenticated = new AuthenticatedLogin(
+    AuthenticatedResult authenticated = new AuthenticatedResult(
         new IssuedAccessToken("signed-access-token", Instant.parse("2026-10-09T15:10:00Z")),
         refreshToken,
-        600);
+        600, Instant.parse("2026-11-08T15:00:00Z"));
     ResponseCookie cookie = ResponseCookie.from("citafin_refresh", "raw-refresh-token")
         .httpOnly(true)
         .secure(true)
@@ -72,7 +76,7 @@ class AuthControllerTests {
         .maxAge(Duration.ofDays(30))
         .build();
     when(loginService.login(EMAIL, PASSWORD)).thenReturn(authenticated);
-    when(refreshCookieFactory.create("raw-refresh-token")).thenReturn(cookie);
+    when(refreshCookieFactory.create("raw-refresh-token", authenticated.sessionExpiresAt())).thenReturn(cookie);
 
     mockMvc.perform(post("/api/v1/auth/login")
             .contentType(MediaType.APPLICATION_JSON)
@@ -91,7 +95,7 @@ class AuthControllerTests {
         .andExpect(jsonPath("$.expiresIn").value(600))
         .andExpect(jsonPath("$.refreshToken").doesNotExist());
 
-    verify(refreshCookieFactory).create("raw-refresh-token");
+    verify(refreshCookieFactory).create("raw-refresh-token", authenticated.sessionExpiresAt());
   }
 
   @Test
@@ -173,6 +177,57 @@ class AuthControllerTests {
             .header(HttpHeaders.ORIGIN, "https://attacker.example")
             .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "POST"))
         .andExpect(status().isForbidden());
+  }
+
+  @Test
+  void refreshReadsCookieAndReturnsReplacementWithoutExposingItInJson() throws Exception {
+    Instant expiration = Instant.parse("2026-11-08T15:00:00Z");
+    AuthenticatedResult result = new AuthenticatedResult(
+        new IssuedAccessToken("new-access", expiration.minusSeconds(1)),
+        new GeneratedSecureToken("new-refresh", new byte[32]), 600, expiration);
+    when(refreshService.refresh("old-refresh")).thenReturn(result);
+    when(refreshCookieFactory.create("new-refresh", expiration)).thenReturn(
+        ResponseCookie.from("citafin_refresh", "new-refresh").httpOnly(true).build());
+
+    mockMvc.perform(post("/api/v1/auth/refresh")
+            .cookie(new Cookie("citafin_refresh", "old-refresh"))
+            .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf()))
+        .andExpect(status().isOk())
+        .andExpect(header().string(HttpHeaders.SET_COOKIE, containsString("citafin_refresh=new-refresh")))
+        .andExpect(jsonPath("$.accessToken").value("new-access"))
+        .andExpect(jsonPath("$.expiresIn").value(600))
+        .andExpect(jsonPath("$.refreshToken").doesNotExist())
+        .andExpect(jsonPath("$.sessionExpiresAt").doesNotExist());
+    verify(refreshService).refresh("old-refresh");
+  }
+
+  @Test
+  void missingAndUnknownRefreshCookiesProduceTheSameUnauthorizedProblem() throws Exception {
+    when(refreshService.refresh(null)).thenThrow(new InvalidRefreshSessionException());
+    when(refreshService.refresh("unknown")).thenThrow(new InvalidRefreshSessionException());
+    for (boolean includeCookie : new boolean[]{false, true}) {
+      var request = post("/api/v1/auth/refresh")
+          .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf());
+      if (includeCookie) request.cookie(new Cookie("citafin_refresh", "unknown"));
+      mockMvc.perform(request)
+          .andExpect(status().isUnauthorized())
+          .andExpect(jsonPath("$.code").value("REFRESH_SESSION_INVALID"))
+          .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+          .andExpect(header().doesNotExist(HttpHeaders.SET_COOKIE));
+    }
+    verifyNoInteractions(refreshCookieFactory);
+  }
+
+  @Test
+  void refreshRequiresCsrfAndRejectsDisallowedOrigin() throws Exception {
+    mockMvc.perform(post("/api/v1/auth/refresh")
+            .cookie(new Cookie("citafin_refresh", "token")))
+        .andExpect(status().isForbidden());
+    mockMvc.perform(post("/api/v1/auth/refresh")
+            .header(HttpHeaders.ORIGIN, "https://attacker.example")
+            .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf()))
+        .andExpect(status().isForbidden());
+    verifyNoInteractions(refreshService, refreshCookieFactory);
   }
 
   private org.springframework.test.web.servlet.ResultActions performValidLogin() throws Exception {

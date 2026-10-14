@@ -17,7 +17,7 @@ public class LoginService {
   private final LoginTransaction loginTransaction;
   private final IdentityProperties properties;
 
-  public AuthenticatedLogin login(String email,String password){
+  public AuthenticatedResult login(String email, String password){
     LoginOutcome loginOutcome=loginTransaction.attempt(email, password);
     if(loginOutcome instanceof LoginOutcome.Success success){
       IssuedAccessToken accessToken= tokenIssuer.issue(
@@ -25,10 +25,12 @@ public class LoginService {
               success.sessionId(),
               success.roles()
       );
-      return new AuthenticatedLogin(
+      return new AuthenticatedResult(
               accessToken,
               success.refreshToken(),
-              properties.session().accessTokenTtl().getSeconds());
+              properties.session().accessTokenTtl().getSeconds(),
+              success.absoluteExpiresAt()
+      );
     }
     LoginOutcome.Failure failure=(LoginOutcome.Failure) loginOutcome;
     throw switch (failure)

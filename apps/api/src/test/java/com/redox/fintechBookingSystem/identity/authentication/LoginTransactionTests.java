@@ -142,7 +142,7 @@ class LoginTransactionTests {
     LoginOutcome result = transaction.attempt("client@example.com", RAW_PASSWORD);
 
     assertThat(result).isEqualTo(new LoginOutcome.Success(
-        USER_ID, SESSION_ID, user.getRoles(), generated));
+        USER_ID, SESSION_ID, user.getRoles(), generated, NOW.plus(REFRESH_TTL)));
     assertThat(user.getFailedLoginCount()).isZero();
     assertThat(user.getFailureWindowStartedAt()).isNull();
     assertThat(user.getLockedUntil()).isNull();

@@ -99,7 +99,8 @@ public class LoginTransaction {
             user.getId(),
             authSession.getId(),
             user.getRoles(),
-            secureToken
+            secureToken,
+            authSession.getAbsoluteExpiresAt()
     );
   }
 }

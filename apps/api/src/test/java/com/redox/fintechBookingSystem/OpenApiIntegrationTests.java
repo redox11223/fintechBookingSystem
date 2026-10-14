@@ -78,6 +78,10 @@ class OpenApiIntegrationTests {
             .value("password"))
         .andExpect(jsonPath("$.components.schemas.LoginRequest.properties.password.writeOnly")
             .value(true))
+        .andExpect(jsonPath("$.paths['/api/v1/auth/refresh'].post.responses['200']").exists())
+        .andExpect(jsonPath("$.paths['/api/v1/auth/refresh'].post.responses['401']").exists())
+        .andExpect(jsonPath("$.paths['/api/v1/auth/refresh'].post.responses['403']").exists())
+        .andExpect(jsonPath("$.paths['/api/v1/auth/refresh'].post.responses['200'].headers['Set-Cookie']").exists())
         .andExpect(jsonPath("$.paths['/api/v1/categories/{id}']").exists())
         .andExpect(jsonPath("$.paths['/api/v1/services/{id}']").exists());
   }

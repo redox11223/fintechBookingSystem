@@ -47,7 +47,8 @@ class LoginServiceTests {
   @Test
   void issuesAccessTokenAfterSuccessfulTransactionalAttempt() {
     LoginOutcome.Success success = new LoginOutcome.Success(
-        USER_ID, SESSION_ID, Set.of(Roles.CLIENT), REFRESH_TOKEN);
+        USER_ID, SESSION_ID, Set.of(Roles.CLIENT), REFRESH_TOKEN,
+        Instant.parse("2026-11-08T15:00:00Z"));
     IssuedAccessToken accessToken =
         new IssuedAccessToken("signed-access-token", Instant.parse("2026-10-09T15:10:00Z"));
     when(loginTransaction.attempt("client@example.com", "valid password phrase"))
@@ -56,12 +57,13 @@ class LoginServiceTests {
     when(properties.session()).thenReturn(sessionProperties);
     when(sessionProperties.accessTokenTtl()).thenReturn(Duration.ofMinutes(10));
 
-    AuthenticatedLogin result =
+    AuthenticatedResult result =
         loginService.login("client@example.com", "valid password phrase");
 
     assertThat(result.accessToken()).isSameAs(accessToken);
     assertThat(result.refreshToken()).isSameAs(REFRESH_TOKEN);
     assertThat(result.accessTokenExpiresInSeconds()).isEqualTo(600);
+    assertThat(result.sessionExpiresAt()).isEqualTo(success.absoluteExpiresAt());
   }
 
   @Test
